@@ -163,7 +163,9 @@ The default text search configuration will be set to "english".
 
 Data page checksums are disabled.
 
-fixing permissions on existing directory /var/lib/postgresql/data ... initdb: error: could not change permissions of directory "/var/lib/postgresql/data": Operation not permitted
+fixing permissions on existing directory /var/lib/postgresql/data ... 
+initdb: error: could not change permissions of directory 
+"/var/lib/postgresql/data": Operation not permitted
 ```
 For this error, I found 2 solutions that worked for me.
 1) [The error is gone when host path is in WSL filesystem.](https://github.com/docker-library/postgres/issues/116#issuecomment-610732280)
