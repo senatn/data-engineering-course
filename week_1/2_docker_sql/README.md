@@ -242,7 +242,7 @@ jupyter-lab
 ```
 Create a new notebook named "upload-data"
 
-The notes of this part are in the [upload-data.ipynb](https://github.com/senatn/data-engineering-course/blob/main/week_1/2_docker_sql/ingest_data.py) file.
+The notes of this part are in the [upload-data.ipynb](https://github.com/senatn/data-engineering-course/blob/main/week_1/2_docker_sql/upload-data.ipynb) file.
 
 ## Use pgAdmin
 
