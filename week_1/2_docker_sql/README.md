@@ -446,8 +446,6 @@ services:
       - pg-network
   pgadmin:
     image: dpage/pgadmin4
-    volumes:
-      - ./data_pgadmin:/var/lib/pgadmin
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin@admin.com
       - PGADMIN_DEFAULT_PASSWORD=root
