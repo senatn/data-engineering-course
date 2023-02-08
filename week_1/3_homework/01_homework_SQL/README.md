@@ -88,11 +88,14 @@ For the passengers picked up in the Astoria Zone which was the drop off zone tha
 We want the name of the zone, not the id.
 
 ```sql
-
+SELECT green_taxi."tip_amount", z2."Zone"
+FROM green_taxi
+INNER JOIN taxi_zone z 
+ON green_taxi."PULocationID"=z."LocationID"
+INNER JOIN taxi_zone z2
+ON green_taxi."DOLocationID"=z2."LocationID"
+WHERE z."Zone" = 'Astoria'
+ORDER BY 1 DESC LIMIT 1;
 ```
 
-- Central Park
-- Jamaica
-- South Ozone Park
 - Long Island City/Queens Plaza
-
