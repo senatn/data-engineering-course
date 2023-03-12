@@ -155,7 +155,11 @@ Run Docker commands without sudo
 https://github.com/sindresorhus/guides/blob/main/docker-without-sudo.md
 
   * Creating SSH `config` file
-Create a file called config in the .ssh directory `touch config` This file will configure SSH. Then open it with VScode `code config`
+The SSH config file is a configuration file used by the OpenSSH client program (ssh) to specify options for connecting to remote servers. The file is usually located in the user's home directory at ~/.ssh/config (on Unix-like systems).
+
+The config file allows users to define various SSH options, such as the host to connect to, the user to log in as, the port to use, and any custom options that may be required. These options can be set globally or for specific hosts, allowing for greater flexibility and convenience in managing SSH connections.
+
+Create a file `touch config` then open it with VScode `code config`
 
 ```config
 Host de-zoomcamp
@@ -206,10 +210,48 @@ Now we can connect to the database with pgcli. host:localhost, user:root, databa
 ```
 pgcli -h localhost -U root -d ny_taxi
 ```
-everything seems fine, but we will uninstall pgcli and install it from conda. First  `pip uninstall pgcli` and then `conda install -c conda-forge pgcli`
+Everything seems fine for me, but we will uninstall pgcli and install it from conda. First  `pip uninstall pgcli` and then `conda install -c conda-forge pgcli`
 
   * Port-forwarding with VS code: connecting to pgAdmin and Jupyter from the local computer
+
+In VScode (remotly conneted to GCP VM) got to ports tab and add 5432 and 8080. Then we can access postgres via localhost:8080
+
+In bash go to `cd data-engineering-zoomcamp/week_1_basics_n_setup/2_docker_sql` directory and download data from ` wget https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz` an unzip cvs.gz file with `find . -name 'yellow_tripdata_2021-01.csv.gz' -print0 | xargs -0 -n1 gzip -d` 
+
+run jupyter `jupyter notebook` in `~/data-engineering-zoomcamp/week_1_basics_n_setup/2_docker_sql$`
+
+In jupyter open `upload-data.ipynb` file and create a schema first, then insert 100 row.
+
+```jupyter
+import pandas as pd
+
+df = pd.read_csv('yellow_tripdata_2021-01.csv', nrows=100)
+
+df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
+
+df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
+
+from sqlalchemy import create_engine
+
+engine = create_engine('postgresql://root:root@localhost:5432/ny_taxi')
+
+df.head(n=0).to_sql(name='yellow_taxi_data', con=engine, if_exists='replace')
+
+df.to_sql(name='yellow_taxi_data', con=engine, if_exists='append')
+
+```
+
+For check 
+` pgcli -h localhost -U root -d ny_taxi`
+` \dt`
+`SELECT COUNT(1) from yellow_taxi_data;`
+
   * Installing Terraform
+`cd bin`
+`wget https://releases.hashicorp.com/terraform/1.4.0/terraform_1.4.0_linux_amd64.zip`
+`sudo apt-get install unzip`
+`unzip  terraform_1.4.0_linux_amd64.zip`
+`rm terraform_1.4.0_linux_amd64.zip`
+
   * Using `sftp` for putting the credentials to the remote machine
   * Shutting down and removing the instance
-
