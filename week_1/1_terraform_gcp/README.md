@@ -254,4 +254,27 @@ For check
 `rm terraform_1.4.0_linux_amd64.zip`
 
   * Using `sftp` for putting the credentials to the remote machine
+
+When you use a Google Cloud service like Google Cloud, you need to authenticate your application using a service account key. This key is a JSON file that contains authentication information for your application.
+
+SFTP (Secure File Transfer Protocol) is a secure protocol used for transferring files over a network. It provides an encrypted channel between the client and server to protect data in transit. [Download service account json](https://cloud.google.com/iam/docs/keys-create-delete#iam-service-account-keys-create-console)
+
+Open a local terminal and go to the folder where you saved your .json account keys. In the terminal, start an SFTP session by typing `sftp de-zoomcamp`. Inside the SFTP session, create a new directory named .gc by typing `mkdir .gc.` Change your working directory to the .gc directory by typing `cd .gc.` Use the put command to upload the files from your local machine to the .gc directory on the remote server. `put ny_rides.json`
+
+By setting the GOOGLE_APPLICATION_CREDENTIALS environment variable to the path of your service account key file, you are telling the Google Cloud SDK and other Google Cloud tools to use that file for authentication.
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS=~/.gc/ny-rides.json
+```
+Now authenticate: 
+```bash
+gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
+```
+`terraform init` +`terraform plan` + `terrafom aply`
   * Shutting down and removing the instance
+
+`sudo shutdown now`
+
+Whenever you shut down and restart your virtual machine, the external IP address assigned to it may change. To connect to the VM using SSH, you need to update the IP address in your `.ssh/config` file before connecting to the VM again. This file stores your SSH configuration settings, including the IP address of your VM.
+
+Make sure to check the external IP address of your VM after each restart and update the IP address in your `.ssh/config` file accordingly to avoid connection errors.
