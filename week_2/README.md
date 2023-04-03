@@ -33,3 +33,21 @@ ELT, on the other hand, stands for Extract, Load, Transform, and refers to a pro
 The main difference between ETL and ELT is the order in which data is transformed. In ETL, data is transformed before it is loaded into the target system, while in ELT, data is loaded into the target system before it is transformed. Another key difference is the use of specialized ETL tools in ETL, which can be costly and require additional training, while ELT relies on tools that are already available within the target system.
 
 In summary, ETL is commonly used in data warehousing, where data is structured and processed before being loaded into the warehouse, while ELT is commonly used in data lakes, where data is stored in its raw format and transformed when it is queried. ETL involves transforming data before it is loaded into the target system using specialized tools, while ELT involves loading data into the target system and transforming it using tools that are already available.
+
+## Data Swamp
+
+Data lakes can become a data swamp when there is a lack of proper governance, metadata management, data cleansing, data transformation, data storage and retrieval optimization, and data use. These issues can lead to a disorganized, unstructured data environment that is difficult to navigate and analyze. It is important to address these issues to prevent a data lake from becoming a data swamp.
+
+## Data Lake Cloud Providers
+
+* Google Cloud Platform > [Cloud Storage](https://cloud.google.com/storage)
+* Amazon Web Services > [Amazon S3](https://aws.amazon.com/s3/)
+* Microsoft Azure > [Azure Blob](https://azure.microsoft.com/en-us/services/storage/blobs/)
+
+## Workflow Orchestration
+
+First, I cloned the Data Engineering Zoomcamp week 2 repository.
+
+```
+git clone https://github.com/discdiver/prefect-zoomcamp.git
+```
