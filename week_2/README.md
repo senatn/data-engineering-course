@@ -46,8 +46,25 @@ Data lakes can become a data swamp when there is a lack of proper governance, me
 
 ## Workflow Orchestration
 
+Workflow orchestration is the process of automating and coordinating the execution of tasks or processes within a larger workflow. In the context of data engineering, workflow orchestration involves defining and automating the sequence of data processing tasks required to transform and store data in a way that is useful for analysis.
+
+Workflow orchestration tools allow you to define complex workflows using a graphical interface or code, and automate the execution of those workflows across different systems and environments. These tools can also handle dependencies between tasks, manage data flow, and provide error handling and retry mechanisms.
+
+Overall, workflow orchestration helps to streamline and automate complex processes, making them more efficient, reliable, and scalable. It also provides better visibility and control over the entire workflow, allowing you to monitor performance, identify issues, and make adjustments as needed.
+
+In this session, we will be exploring a simple Python script that extracts yellow taxi data and loads it into a Postgres database. We will then modify the script to be orchestrated with Prefect, a workflow management system for data engineering.
+
+## Prefect
+
+Prefect is an open-source workflow management system for data engineering. It is designed to make it easy to build, schedule, and monitor data pipelines in Python. Prefect provides a platform-agnostic way to define workflows and execute them across a variety of execution environments, such as local machines, servers, or cloud platforms.
+
+[Introduction to Workflow Orchestration with Prefect- Kevin Kho | SciPy 2022]( https://youtu.be/XL4wgLUp-VA)
+
 First, I cloned the Data Engineering Zoomcamp week 2 repository.
 
 ```
 git clone https://github.com/discdiver/prefect-zoomcamp.git
 ```
+
+And activate conda `conda activate` and then install all requirements using requirements.txt file `pip install -r requirements.txt`
+
