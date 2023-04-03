@@ -5,7 +5,7 @@ After updating the main.tf and variable.tf files run:
 ```
 terraform apply
 ```
-
+```
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   + create
@@ -106,3 +106,4 @@ google_storage_bucket.data-lake-bucket: Creation complete after 2s [id=dtc_data_
 google_bigquery_dataset.dataset: Creation complete after 3s [id=projects/xxx/datasets/trips_data_all]
 
 Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+```
