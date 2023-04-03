@@ -52,7 +52,19 @@ Workflow orchestration tools allow you to define complex workflows using a graph
 
 Overall, workflow orchestration helps to streamline and automate complex processes, making them more efficient, reliable, and scalable. It also provides better visibility and control over the entire workflow, allowing you to monitor performance, identify issues, and make adjustments as needed.
 
-In this session, we will be exploring a simple Python script that extracts yellow taxi data and loads it into a Postgres database. We will then modify the script to be orchestrated with Prefect, a workflow management system for data engineering.
+The core features of workflow orchestration typically include:
+
+Task definition: The ability to define individual tasks within a workflow, including their inputs, outputs, and dependencies on other tasks.
+
+Workflow definition: The ability to define the overall workflow structure, including the sequence of tasks and their dependencies.
+
+Execution management: The ability to manage the execution of the workflow, including starting, stopping, and pausing individual tasks or the entire workflow.
+
+Error handling and retry mechanisms: The ability to detect and handle errors that occur during task execution, and to retry failed tasks.
+
+Monitoring and logging: The ability to monitor the progress of the workflow, including task status, task inputs and outputs, and overall workflow performance. Logging is also important for debugging issues that arise during the execution of the workflow.
+
+Integration with external systems: The ability to integrate with external systems, such as data storage platforms, compute platforms, and messaging systems, to allow for the orchestration of complex data engineering workflows.
 
 ## Prefect
 
@@ -60,6 +72,8 @@ Prefect is an open-source workflow management system for data engineering. It is
 
 [Introduction to Workflow Orchestration with Prefect- Kevin Kho | SciPy 2022]( https://youtu.be/XL4wgLUp-VA)
 
+
+In this session, we will be exploring a simple Python script that extracts yellow taxi data and loads it into a Postgres database. We will then modify the script to be orchestrated with Prefect, a workflow management system for data engineering.
 First, I cloned the Data Engineering Zoomcamp week 2 repository.
 
 ```
