@@ -72,13 +72,11 @@ Prefect is an open-source workflow management system for data engineering. It is
 
 [Introduction to Workflow Orchestration with Prefect- Kevin Kho | SciPy 2022]( https://youtu.be/XL4wgLUp-VA)
 
-
 In this session, we will be exploring a simple Python script that extracts yellow taxi data and loads it into a Postgres database. We will then modify the script to be orchestrated with Prefect, a workflow management system for data engineering.
 First, I cloned the Data Engineering Zoomcamp week 2 repository.
 
-```
+```bash
 git clone https://github.com/discdiver/prefect-zoomcamp.git
 ```
 
 And activate conda `conda activate` and then install all requirements using requirements.txt file `pip install -r requirements.txt`
-
