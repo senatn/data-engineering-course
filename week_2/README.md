@@ -72,11 +72,49 @@ Prefect is an open-source workflow management system for data engineering. It is
 
 [Introduction to Workflow Orchestration with Prefect- Kevin Kho | SciPy 2022]( https://youtu.be/XL4wgLUp-VA)
 
-In this session, we will be exploring a simple Python script that extracts yellow taxi data and loads it into a Postgres database. We will then modify the script to be orchestrated with Prefect, a workflow management system for data engineering.
+We will be exploring a simple Python script that extracts yellow taxi data and loads it into a Postgres database. We will then modify the script to be orchestrated with Prefect, a workflow management system for data engineering.
+
 First, I cloned the Data Engineering Zoomcamp week 2 repository.
 
-```bash
-git clone https://github.com/discdiver/prefect-zoomcamp.git
+`git clone https://github.com/discdiver/prefect-zoomcamp.git`
+
+Create a conda environment
+
+`conda create -n zoom python=3.9`
+
+And activate conda
+
+`conda activate zoom`
+
+and then install all requirements using requirements.txt file
+
+`pip install -r requirements.txt`
+
+Now we can set up our enviroment on GCP or local. First I wanna try it in local
+
+Open a new terminal in your .yaml file location 
+
+`sudo service docker start`
+
+`docker compose up`
+
+Modify ingest_data.py
+
+```python
+if __name__ == '__main__':
+    user = "root"
+    password = "root"
+    host = "localhost"
+    port = "5432"
+    db = "ny_taxi"
+    table_name = "yellow_taxi_trips"
+    csv_url = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
+
+    ingest_data(user, password, host, port, db, table_name, csv_url
 ```
 
-And activate conda `conda activate` and then install all requirements using requirements.txt file `pip install -r requirements.txt`
+run python `ingest_data.py`
+
+Finally `Finished ingesting data into the postgres database` now we can go to `localhost:8080` and log into pgadmin. Create a new server: name "Docker localhost", port: "5432", host: "pgdatabase"
+
+OK everything is fine but I wanna setup an environment in GCP.
