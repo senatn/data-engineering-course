@@ -10,4 +10,4 @@ Start: 26 January 2023
 
 [Week 1 - Terraform and Google Cloud Platform](https://github.com/senatn/data-engineering-course/tree/main/week_1/1_terraform_gcp)
 
-[Week 2 - Data Lake](https://github.com/senatn/data-engineering-course/tree/main/week_2)
+[Week 2 - Workflow Orchestration](https://github.com/senatn/data-engineering-course/tree/main/week_2)
