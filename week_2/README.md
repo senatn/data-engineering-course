@@ -117,4 +117,4 @@ run python `ingest_data.py`
 
 Finally `Finished ingesting data into the postgres database` now we can go to `localhost:8080` and log into pgadmin. Create a new server: name "Docker localhost", port: "5432", host: "pgdatabase"
 
-OK everything is fine but I wanna setup an environment in GCP.
+OK everything is fine but I wanna setup an environment in GCP
