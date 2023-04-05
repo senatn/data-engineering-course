@@ -66,11 +66,6 @@ Monitoring and logging: The ability to monitor the progress of the workflow, inc
 
 Integration with external systems: The ability to integrate with external systems, such as data storage platforms, compute platforms, and messaging systems, to allow for the orchestration of complex data engineering workflows.
 
-## Prefect
-
-Prefect is an open-source workflow management system for data engineering. It is designed to make it easy to build, schedule, and monitor data pipelines in Python. Prefect provides a platform-agnostic way to define workflows and execute them across a variety of execution environments, such as local machines, servers, or cloud platforms.
-
-[Introduction to Workflow Orchestration with Prefect- Kevin Kho | SciPy 2022]( https://youtu.be/XL4wgLUp-VA)
 
 We will be exploring a simple Python script that extracts yellow taxi data and loads it into a Postgres database. We will then modify the script to be orchestrated with Prefect, a workflow management system for data engineering.
 
@@ -166,3 +161,8 @@ Open a new terminal in .yaml file location and create a Docker Volume.
 `python ingest_data.py`
 
 To get started, launch pgAdmin and log in. Then, add a new server by pasting the name of the database container as the server name Then, I check the number of rows `SELECT COUNT(1) FROM yellow_taxi_trips` `1369765`
+## Loading data into Postgres using Prefect
+
+Prefect is an open-source workflow management system for data engineering. It is designed to make it easy to build, schedule, and monitor data pipelines in Python. Prefect provides a platform-agnostic way to define workflows and execute them across a variety of execution environments, such as local machines, servers, or cloud platforms.
+
+[Introduction to Workflow Orchestration with Prefect- Kevin Kho | SciPy 2022]( https://youtu.be/XL4wgLUp-VA)
