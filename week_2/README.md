@@ -101,6 +101,7 @@ Open a new terminal in your .yaml file location
 Modify ingest_data.py
 
 ```python
+
 if __name__ == '__main__':
     user = "root"
     password = "root"
@@ -113,7 +114,7 @@ if __name__ == '__main__':
     ingest_data(user, password, host, port, db, table_name, csv_url
 ```
 
-run python `ingest_data.py`
+run `python ingest_data.py`
 
 Finally `Finished ingesting data into the postgres database` now we can go to `localhost:8080` and log into pgadmin. Create a new server: name "Docker localhost", port: "5432", host: "pgdatabase"
 
@@ -125,18 +126,43 @@ I cloned the Data Engineering Zoomcamp week 2 repository.
 
 Create a conda environment
 
-`conda create -n zoom python=3.9`
+`conda create -n zoomcamp python=3.9`
 
 And activate conda
 
-`conda activate zoom`
+`conda activate zoomcamp`
 
 and then install all requirements using requirements.txt file
 
 `pip install -r requirements.txt`
 
-Open a new terminal in your .yaml file location 
+Modify ingest_data.py in VM
 
-`sudo service docker start`
+```python
+if __name__ == '__main__':
+    user = "root"
+    password = "root"
+    host = "localhost"
+    port = "5432"
+    db = "ny_taxi"
+    table_name = "yellow_taxi_trips"
+    csv_url = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
+
+    ingest_data(user, password, host, port, db, table_name, csv_url
+```
+
+Add the required ports in a remote SSH session from VSCode, such as `5432` `8080`
+
+I cloned my Data Engineering Zoomcamp repository because I am using a Docker volume and I want to continue using it this way.
+
+`git clone https://github.com/senatn/data-engineering-course.git`
+
+Open a new terminal in .yaml file location and create a Docker Volume.
+
+`docker volume create --name dtc_postgres_volume_local -d local`
 
 `docker compose up`
+
+run `python ingest_data.py`
+
+To get started, launch pgAdmin and log in. Then, add a new server by pasting the name of the database container as the server name Then, I check the number of rows `SELECT COUNT(1) FROM yellow_taxi_trips1` `1369765`
