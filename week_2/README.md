@@ -74,6 +74,8 @@ Prefect is an open-source workflow management system for data engineering. It is
 
 We will be exploring a simple Python script that extracts yellow taxi data and loads it into a Postgres database. We will then modify the script to be orchestrated with Prefect, a workflow management system for data engineering.
 
+We can set up our enviroment on GCP or local. First I wanna try it in local
+
 First, I cloned the Data Engineering Zoomcamp week 2 repository.
 
 `git clone https://github.com/discdiver/prefect-zoomcamp.git`
@@ -89,8 +91,6 @@ And activate conda
 and then install all requirements using requirements.txt file
 
 `pip install -r requirements.txt`
-
-Now we can set up our enviroment on GCP or local. First I wanna try it in local
 
 Open a new terminal in your .yaml file location 
 
@@ -117,4 +117,26 @@ run python `ingest_data.py`
 
 Finally `Finished ingesting data into the postgres database` now we can go to `localhost:8080` and log into pgadmin. Create a new server: name "Docker localhost", port: "5432", host: "pgdatabase"
 
-OK everything is fine but I wanna setup an environment in GCP
+OK everything is fine but I wanna setup an environment in GCP. First, start GCP VM instance and copy external IP. After that, I will edit the `config` file in the `.ssh` folder. Replace the old `HostName` address with the new external IP and save the file. And I start remote ssh session from VScode.
+
+I cloned the Data Engineering Zoomcamp week 2 repository.
+
+`git clone https://github.com/discdiver/prefect-zoomcamp.git`
+
+Create a conda environment
+
+`conda create -n zoom python=3.9`
+
+And activate conda
+
+`conda activate zoom`
+
+and then install all requirements using requirements.txt file
+
+`pip install -r requirements.txt`
+
+Open a new terminal in your .yaml file location 
+
+`sudo service docker start`
+
+`docker compose up`
