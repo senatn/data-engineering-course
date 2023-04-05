@@ -151,7 +151,7 @@ if __name__ == '__main__':
     ingest_data(user, password, host, port, db, table_name, csv_url
 ```
 
-Add the required ports in a remote SSH session from VSCode, such as `5432` `8080`
+Add the required ports in a remote SSH session from VSCode, such as `5432` `8080` By doing this, we will be able to access these ports in the local browser via a remote connection.
 
 I cloned my Data Engineering Zoomcamp repository because I am using a Docker volume and I want to continue using it this way.
 
@@ -161,8 +161,8 @@ Open a new terminal in .yaml file location and create a Docker Volume.
 
 `docker volume create --name dtc_postgres_volume_local -d local`
 
-`docker compose up`
+`docker-compose up`
 
-run `python ingest_data.py`
+`python ingest_data.py`
 
-To get started, launch pgAdmin and log in. Then, add a new server by pasting the name of the database container as the server name Then, I check the number of rows `SELECT COUNT(1) FROM yellow_taxi_trips1` `1369765`
+To get started, launch pgAdmin and log in. Then, add a new server by pasting the name of the database container as the server name Then, I check the number of rows `SELECT COUNT(1) FROM yellow_taxi_trips` `1369765`
