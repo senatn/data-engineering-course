@@ -161,8 +161,36 @@ Open a new terminal in .yaml file location and create a Docker Volume.
 `python ingest_data.py`
 
 To get started, launch pgAdmin and log in. Then, add a new server by pasting the name of the database container as the server name Then, I check the number of rows `SELECT COUNT(1) FROM yellow_taxi_trips` `1369765`
-## Loading data into Postgres using Prefect
+## Prefect
 
 Prefect is an open-source workflow management system for data engineering. It is designed to make it easy to build, schedule, and monitor data pipelines in Python. Prefect provides a platform-agnostic way to define workflows and execute them across a variety of execution environments, such as local machines, servers, or cloud platforms.
 
 [Introduction to Workflow Orchestration with Prefect- Kevin Kho | SciPy 2022]( https://youtu.be/XL4wgLUp-VA)
+
+Some concepts in Prefect are:
+
+Task: A unit of work in Prefect. Tasks are defined as Python functions and can be connected to other tasks to form a workflow.
+
+Flow: A collection of tasks that are connected to form a workflow. Flows can be executed and monitored by Prefect.
+
+Edge: A connection between two tasks in a flow. Edges define the data dependencies between tasks.
+
+Parameter: A value that is passed to a task at runtime. Parameters can be used to make tasks more flexible.
+
+Parameterized flow: A flow that has one or more parameters. Parameterized flows can be executed multiple times with different parameter values.
+
+State: The current status of a task or flow. States can be used to track the progress of a workflow and to handle errors and retries.
+
+Task Runner: A component in Prefect that executes tasks. Task runners are responsible for handling task dependencies, retries, and state management.
+
+Flow Runner: A component in Prefect that executes flows. Flow runners are responsible for handling flow scheduling, state management, and monitoring.
+
+## Python Decorators
+
+In Python, a decorator is a special kind of function that can modify or enhance the behavior of another function or class. Decorators allow you to add functionality to existing functions or classes without modifying their source code.
+
+Decorators are defined using the "@" symbol followed by the decorator function name, which is applied to the target function or class. The decorator function takes the target function or class as an argument and returns a modified version of it.
+
+## Loading data into Postgres using Prefect
+
+Let's transform `ingest_data.py` into a Prefect flow.
