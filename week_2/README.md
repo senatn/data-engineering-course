@@ -285,6 +285,16 @@ def extract_data(url: str):
     return df
 ```
 
+`log_prints=True:` This parameter enables logging for the task, which means that any print statements in the task function will be logged by Prefect.
+
+`tags=["extract"]:` This parameter allows you to add tags to the task. Tags are used to categorize and organize tasks within a flow.
+
+`retries=3:` This parameter specifies the number of times the task should be retried if it fails due to an exception or error. In this case, the task will be retried up to 3 times.
+
+`cache_key_fn=task_input_hash:` This parameter specifies the function to use for generating the cache key for the task. In this case, `task_input_hash` is used, which calculates a unique hash value for the input parameters of the task. This helps Prefect to cache the task's output based on its input parameters.
+
+`cache_expiration=timedelta(days=1):` This parameter specifies the expiration time for the task's cache. In this case, the cache will expire after 1 day, meaning that if the task is executed again after 1 day, its output will be recalculated even if its input parameters haven't changed.
+
 Moving on, upon examining the data in `ny_taxi`, you may notice that the passenger count in row 4 is 0. Therefore, we need to perform a data cleansing transformation step before loading the data into PostgreSQL. To accomplish this, I will create a new task called `transform_data`. It's worth noting that the dataframe can be effortlessly passed to the following task.
 
 ```python
@@ -295,8 +305,16 @@ def transform_data(df):
     print(f"post: missing passenger count: {df['passenger_count'].isin([0]).sum()}")
     return df
 ```
+`isin()` and `sum()` are both functions provided by the pandas library in Python for working with dataframes.
+
+The `isin()` function allows you to check whether a particular element or value is present in a dataframe column or not. It takes a list, array, or series of values as input and returns a boolean dataframe where True indicates that the element is present in the corresponding row, and False indicates that it is not.
+
+The `sum()` function, on the other hand, calculates the sum of values in a dataframe column or row. By default, it operates on the columns of the dataframe, but you can specify the axis parameter to operate on rows instead.
+
+`print({df['passenger_count'].isin([0]).sum()}"))` prints the total sum of `passenger_count` values that do not exist.
 
 Lastly, let’s actually simplify the original ingest_data() function and rename this to load_data()
+
 ```python
 @task(log_prints=True, retries=3)
 def load_data(user, password, host, port, db, table_name, df):
@@ -308,6 +326,7 @@ def load_data(user, password, host, port, db, table_name, df):
 ```
 
 main() function now looks like:
+
 ```python
 @flow(name="Ingest Flow")
 def main(user, password, host, port, db, table_name, csv_url):
@@ -316,6 +335,57 @@ def main(user, password, host, port, db, table_name, csv_url):
   load_data(user, password, host, port, db, table_name, data)
 Let’s clean the db and run the flow again with drop table yellow_taxi_trips
 ```
+
 Now let's run our flow `python ingest_data.py`
 
 And if we look at the DB, we can see there are no more passenger counts of 0.
+
+We can enhance our flow further by incorporating more of Prefect's features. For example, we could introduce parameterization to the flow, allowing us to specify a table name as an input. This would make it easy to switch between different tables each time the flow is executed.
+
+```python
+@flow(name="Ingest Data")
+def main(table_name: str):
+  user = "postgres"
+  password = "admin"
+  host = "localhost"
+  port = "5433"
+  db = "ny_taxi"
+  table_name = "yellow_taxi_trips"
+  csv_url = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
+
+  raw_data = extract_data(csv_url)
+  data = transform_data(raw_data)
+  load_data(user, password, host, port, db, table_name, data)
+
+if __name__ == "__main__":
+  main("yellow_taxi_trips")
+```
+In Prefect, a subflow is a way to encapsulate a group of tasks within a larger flow. It allows you to break down a complex workflow into smaller, more manageable sub-workflows, each with its own set of tasks. 
+
+Using subflows can make your workflows more modular and easier to maintain. For example, you might have a subflow that loads data from an external source, another subflow that cleans and transforms the data, and a third subflow that loads the data into a database. Each of these subflows could be developed and tested separately, then combined together into a larger, more complex workflow.
+
+One benefit of using subflows is that they can be reused across multiple workflows. For example, if you have a subflow that handles authentication and authorization, you can reuse that subflow in multiple workflows that require authentication and authorization.
+
+Another benefit of using subflows is that they can help to improve the readability and organization of your code. By breaking down a large, complex workflow into smaller, more focused subflows, you can make it easier to understand and maintain the workflow over time.
+
+Add function log_subflow():
+
+```python
+@flow(name="Subflow", log_prints=True)
+def log_subflow(table_name : str):
+  print(f"Logging Subflow for {table_name}")
+```
+
+Add newline log_subflow(table_name) to the main() flow
+
+## Prefect Orion UI
+
+Prefect Orion UI is a user interface for Prefect 2.0. It allows you to gain complete visibility and control over your workflows.
+
+To configure the Prefect API URL in the Prefect configuration, you need to run the following command:
+
+`prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api`
+
+The Prefect API URL is the endpoint that Prefect uses to communicate with the Prefect API, which is a REST API providing programmatic access to Prefect flows, tasks, and runs.
+
+Setting the Prefect API URL to `http://127.0.0.1:4200/api` means that Prefect will use a local instance of the Prefect API running at that URL. This is usually done for local development or testing purposes, where you want to run the Prefect API on your local machine.
