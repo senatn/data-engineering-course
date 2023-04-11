@@ -161,6 +161,10 @@ Open a new terminal in .yaml file location and create a Docker Volume.
 `python ingest_data.py`
 
 To get started, launch pgAdmin and log in. Then, add a new server by pasting the name of the database container as the server name Then, I check the number of rows `SELECT COUNT(1) FROM yellow_taxi_trips` `1369765`
+
+Okay, by checking in pgAdmin4, we can confirm that the data has been successfully ingested into the PostgreSQL database. However, the process of executing the Python script was done manually. By utilizing a workflow orchestration tool, I will be able to automate this process and schedule it to run automatically. This way, I won't have to manually trigger the script anymore.
+
+Moreover, using a workflow orchestration tool offers additional functionalities, such as enhanced visibility into the workflow, the ability to add resilience to the dataflow with automatic retries or caching, and more.
 ## Prefect
 
 Prefect is an open-source workflow management system for data engineering. It is designed to make it easy to build, schedule, and monitor data pipelines in Python. Prefect provides a platform-agnostic way to define workflows and execute them across a variety of execution environments, such as local machines, servers, or cloud platforms.
@@ -193,4 +197,125 @@ Decorators are defined using the "@" symbol followed by the decorator function n
 
 ## Loading data into Postgres using Prefect
 
-Let's transform `ingest_data.py` into a Prefect flow.
+Let's transform `ingest_data.py` into a Prefect flow. By utilizing the task and flow concept, we can decompose the ingest_data Python script into several tasks and flows, resulting in a more comprehensive visualization of our workflow. Essentially, we will divide the current ingest_data.py into multiple functions and integrate Python decorators to construct a Prefect workflow.
+
+```python
+#!/usr/bin/env python
+# coding: utf-8
+import os
+import argparse
+from time import time
+import pandas as pd
+from sqlalchemy import create_engine
+from prefect import flow, task # IMPORT PREFECT
+
+# FLOWS CONTAINS TASK SO TRANSFORM ingest_data() INTO A TASK BY ADDING @task DECORATOR
+@task(log_prints=True, retries=3)
+def ingest_data(user, password, host, port, db, table_name, url):
+    
+    # the backup files are gzipped, and it's important to keep the correct extension
+    # for pandas to be able to open the file
+    if url.endswith('.csv.gz'):
+        csv_name = 'yellow_tripdata_2021-01.csv.gz'
+    else:
+        csv_name = 'output.csv'
+
+    os.system(f"wget {url} -O {csv_name}")
+    postgres_url = f'postgresql://{user}:{password}@{host}:{port}/{db}'
+    engine = create_engine(postgres_url)
+
+    df_iter = pd.read_csv(csv_name, iterator=True, chunksize=100000)
+
+    df = next(df_iter)
+
+    df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
+    df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
+
+    df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace')
+
+    df.to_sql(name=table_name, con=engine, if_exists='append')
+
+# CREATE A main_flow FUNCTIPN AND ADD @flow DECORATOR ABOVE FUNCTION     
+@flow(name="Ingest Flow")
+def main_flow():
+    user = "root"
+    password = "root"
+    host = "localhost"
+    port = "5432"
+    db = "ny_taxi"
+    table_name = "yellow_taxi_trips"
+    csv_url = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
+
+    ingest_data(user, password, host, port, db, table_name, csv_url)
+
+if __name__ == '__main__':
+    main_flow()
+```
+
+First clean database so go back to pgadmin `DROP TABLE yellow_taxi_trips` Now let’s run the `ingest_data.py` as a Prefect flow `python ingest_data.py`
+
+Great, so the script has been executed as a flow. Now, we can simplify the script by transforming it into an extract and transform process before loading the data into the PostgreSQL database.
+
+To begin, let's break down the large `ingest_data` function into smaller functions, which will allow us to gain more visibility into the tasks that are running and identify potential causes of failures.
+
+We'll start by creating a new task called `extract_data`, which will receive the CSV URL as input and return the results. Given that this task pulls data from an external system that I may not control, I want to include automatic retries and caching, so that the task doesn't need to be re-run if it has already been executed.
+
+```python
+from prefect.tasks import task_input_hash
+from datetime import timedelta
+
+@task(log_prints=True, tags=["extract"], cache_key_fn=task_input_hash, cache_expiration=timedelta(days=1))
+def extract_data(url: str):
+    # the backup files are gzipped, and it's important to keep the correct extension
+    # for pandas to be able to open the file
+    if url.endswith('.csv.gz'):
+        csv_name = 'yellow_tripdata_2021-01.csv.gz'
+    else:
+        csv_name = 'output.csv'
+    
+    os.system(f"wget {url} -O {csv_name}")
+
+    df_iter = pd.read_csv(csv_name, iterator=True, chunksize=100000)
+
+    df = next(df_iter)
+
+    df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
+    df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
+
+    return df
+```
+
+Moving on, upon examining the data in `ny_taxi`, you may notice that the passenger count in row 4 is 0. Therefore, we need to perform a data cleansing transformation step before loading the data into PostgreSQL. To accomplish this, I will create a new task called `transform_data`. It's worth noting that the dataframe can be effortlessly passed to the following task.
+
+```python
+@task(log_prints=True)
+def transform_data(df):
+    print(f"pre: missing passenger count: {df['passenger_count'].isin([0]).sum()}")
+    df = df[df['passenger_count'] != 0]
+    print(f"post: missing passenger count: {df['passenger_count'].isin([0]).sum()}")
+    return df
+```
+
+Lastly, let’s actually simplify the original ingest_data() function and rename this to load_data()
+```python
+@task(log_prints=True, retries=3)
+def load_data(user, password, host, port, db, table_name, df):
+  postgres_url = f'postgresql://{user}:{password}@{host}:{port}/{db}'
+  engine = create_engine(postgresql_url)
+
+  df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace')
+  df.to_sql(name=table)name, con=engine, if_exists='append')
+```
+
+main() function now looks like:
+```python
+@flow(name="Ingest Flow")
+def main(user, password, host, port, db, table_name, csv_url):
+  raw_data = extract_data(csv_url)
+  data = transform_data(raw_data)
+  load_data(user, password, host, port, db, table_name, data)
+Let’s clean the db and run the flow again with drop table yellow_taxi_trips
+```
+Now let's run our flow `python ingest_data.py`
+
+And if we look at the DB, we can see there are no more passenger counts of 0.
