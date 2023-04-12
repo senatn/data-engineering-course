@@ -1,10 +1,6 @@
-# Docker & SQL
+# Introduction to Docker
 
-These notes are prepared for part 1.2.1 to 1.2.6 of the [video series](https://www.youtube.com/playlist?list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb).
-
-# Docker
-
-### Why should we care about Docker?
+## Why should we care about Docker?
 * Reproducibality
 * Local Experiments
 * Integration tests (CI/CD)
@@ -12,7 +8,7 @@ These notes are prepared for part 1.2.1 to 1.2.6 of the [video series](https://w
 * Spark (for defining data pipelines)
 * Serverless (AWS Lamda, Google functions)
 
-### Docker Commands
+## Docker Commands
 
 Usage:  
 ```
@@ -125,7 +121,7 @@ ENTRYPOINT [ "python", "pipeline.py" ]
 
 `ENTRYPOINT [ "python", "pipeline.py" ]` When we runing `docker run` it start with python interpreter and runs pipeline.py
 
-## Run Postgres in Docker
+# Ingesting NY Taxi Data to Postgres
 
 Before create a Postgres container I had to create a local docker volume because when I run my docker code with my local file path I got an error. But first...
 
@@ -204,7 +200,7 @@ docker run -it\
   ```
 And now we can try accessing this database
 
-## Accessing The Database
+# Connecting pgAdmin and Postgres
 
 `pgcli` is a command-line interface (CLI) tool for PostgreSQL, an open-source relational database management system. `pgcli` provides an interface for running SQL queries, autocompletion, syntax highlighting, and other features to make it easier to interact with PostgreSQL databases. 
 
@@ -306,7 +302,7 @@ docker run -it \
 
 Go to ""localhost:8080"" in the browser and login. Create a new server with using container variables. Now we can navigate to our data.
 
-## Data ingestion With Python Script
+# Data ingestion With Python Script
 
 ```
 jupyter nbconvert --to=script upload-data.ipynb
@@ -386,7 +382,7 @@ To check, we can make a query from pgAdmin.
 ```
 SELECT COUNT(1) FROM yellow_taxi_trips;
 ```
-## Docker Compose
+# Docker Compose
 
 So far, we have created separate Docker commands for Postgres and pgAdmin using a network, but this is not an efficient solution. Typically, docker compose is used for multi-container configurations. Docker Compose is a tool for defining and running multi-container Docker applications. It allows you to define your application's services, networks, and volumes in a single file, called a docker-compose.yml file, and then start and stop all services from this file. This makes it easier to manage and configure multiple containers as a single application, rather than managing each container individually.
 

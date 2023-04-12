@@ -2,7 +2,7 @@
 
 # GCP
 
-### Initial Setup
+## Initial Setup
 
 For this course, we'll use a free version (upto EUR 300 credits). 
 
@@ -21,7 +21,7 @@ For this course, we'll use a free version (upto EUR 300 credits).
    gcloud auth application-default login
    ```
    
-### Setup for Access
+## Setup for Access
  
 1. [IAM Roles](https://cloud.google.com/storage/docs/access-control/iam-roles) for Service account:
    * Go to the *IAM* section of *IAM & Admin* https://console.cloud.google.com/iam-admin/iam
@@ -107,7 +107,7 @@ terraform destroy
 ```
 
 
-### Setup an Environment in GCP
+# Setup an Environment in GCP
 
 For the course you'll need:
 
