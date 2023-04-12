@@ -316,9 +316,10 @@ if url.endswith('.csv.gz'):
 else:
     csv_name = 'output.csv'
 ```
-We will also see that the library named argparse is used.
 
-`argparse` is a standard Python library that makes it easy to write user-friendly command-line interfaces. It provides a simple and flexible way to specify and parse command-line arguments and options.`argparse` then takes care of parsing the command-line arguments passed to your script, checking for required arguments, and automatically generating usage and error messages.
+### Parametrizing the script with argparse
+
+We will also see that the library named argparse is used. `argparse` is a standard Python library that makes it easy to write user-friendly command-line interfaces. It provides a simple and flexible way to specify and parse command-line arguments and options.`argparse` then takes care of parsing the command-line arguments passed to your script, checking for required arguments, and automatically generating usage and error messages.
 
 Drop the current table in pgAdmin
 ```
