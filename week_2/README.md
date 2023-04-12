@@ -389,3 +389,14 @@ To configure the Prefect API URL in the Prefect configuration, you need to run t
 The Prefect API URL is the endpoint that Prefect uses to communicate with the Prefect API, which is a REST API providing programmatic access to Prefect flows, tasks, and runs.
 
 Setting the Prefect API URL to `http://127.0.0.1:4200/api` means that Prefect will use a local instance of the Prefect API running at that URL. This is usually done for local development or testing purposes, where you want to run the Prefect API on your local machine.
+
+`prefect orion start`
+
+Upon opening localhost, the Prefect UI can be seen, which provides a user-friendly dashboard to view the history of all flow runs.
+
+If we execute a flow again, we can see the same flow name in our terminal and in the Prefect UI. The UI provides a convenient dashboard where we can view the run history of all our flows.
+
+The UI also has features such as Deployments, Workqueues, Blocks, Notifications, and TaskRun Concurrency. Although we will discuss Deployments and Workqueues in a later video, let's briefly touch on Blocks, Notifications, and TaskRun Concurrency. TaskRun Concurrency can be configured for tasks by adding a tag to the task and setting a limit through a CLI command.
+
+Notifications are essential for keeping us informed when something goes wrong with our system. Instead of monitoring the dashboard frequently, we can set up notifications to alert us when an issue occurs that requires investigation.
+
