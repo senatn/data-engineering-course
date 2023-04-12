@@ -396,7 +396,5 @@ Upon opening localhost, the Prefect UI can be seen, which provides a user-friend
 
 If we execute a flow again, we can see the same flow name in our terminal and in the Prefect UI. The UI provides a convenient dashboard where we can view the run history of all our flows.
 
-The UI also has features such as Deployments, Workqueues, Blocks, Notifications, and TaskRun Concurrency. Although we will discuss Deployments and Workqueues in a later video, let's briefly touch on Blocks, Notifications, and TaskRun Concurrency. TaskRun Concurrency can be configured for tasks by adding a tag to the task and setting a limit through a CLI command.
-
-Notifications are essential for keeping us informed when something goes wrong with our system. Instead of monitoring the dashboard frequently, we can set up notifications to alert us when an issue occurs that requires investigation.
+The UI also has features such as Deployments, Workqueues, Blocks, Notifications, and Tas kRun Concurrency. Tas kRun Concurrency can be configured for tasks by adding a tag to the task and setting a limit through a CLI command. Notifications are essential for keeping us informed when something goes wrong with our system. Instead of monitoring the dashboard frequently, we can set up notifications to alert us when an issue occurs that requires investigation.
 
