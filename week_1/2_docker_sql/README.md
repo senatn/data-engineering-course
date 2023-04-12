@@ -1,6 +1,6 @@
 # Introduction to Docker
 
-## Why should we care about Docker?
+### Why should we care about Docker?
 * Reproducibality
 * Local Experiments
 * Integration tests (CI/CD)
@@ -8,7 +8,7 @@
 * Spark (for defining data pipelines)
 * Serverless (AWS Lamda, Google functions)
 
-## Docker Commands
+### Docker Commands
 
 Usage:  
 ```
@@ -42,7 +42,7 @@ docker build -t test:pandas .
 
 `-a`  all
 
-## Let's Start Using Docker
+### Let's Start Using Docker
 
 First, its good to be read this [create a new container](https://docs.docker.com/engine/reference/commandline/create/) page in docker documentation.
 
@@ -50,7 +50,7 @@ We need to use Python and the Pandas library in our first container. To do that,
 
 When we leave the container and run the docker `run -it python:3.9` command again, Docker will create a new container with the same image. We can use the ` docker container start [OPTIONS] CONTAINER [CONTAINER...]` (or shorthand: `docker start <container name or id>`) command to start the container at any point.
 
-## Dockerfile
+### Dockerfile
 
 [What is a Dockerfile?](https://docs.docker.com/engine/reference/builder/)
 
@@ -83,7 +83,7 @@ And we create a container with this image with following command.
 docker run -it test:pandas
 ```
 
-## Create a Pipeline
+### Create a Pipeline
 
 
 We create a file named `pipeline.py` in the current directory.
@@ -212,7 +212,7 @@ pgcli -h localhost -p 5432 -u root -d ny_taxi
 ```
 After entering the password (root), we are now connected to postgres. We can test the connection with `\dt` command.
 
-## Downloading The NY Taxi Data
+### Downloading The NY Taxi Data
 
 Download the data 
 
@@ -230,7 +230,7 @@ head -n 100 yellow_tripdata_2021-01.csv
 ```
 wc -l yellow_tripdata_2021-01.csv
 ```
-## Reading CSV with Pandas
+### Reading CSV with Pandas
 
 I will use jupyter lab. Jupyter Lab is a web-based interactive development environment (IDE) for working with Jupyter notebooks, code, and data.
 ```
@@ -240,7 +240,7 @@ Create a new notebook named "upload-data"
 
 The notes of this part are in the [upload-data.ipynb](https://github.com/senatn/data-engineering-course/blob/main/week_1/2_docker_sql/upload-data.ipynb) file.
 
-## Use pgAdmin
+### Use pgAdmin
 
 `pgAdmin` is a free and open-source administration and management tool for the PostgreSQL relational database management system. It provides a graphical user interface for managing and interacting with PostgreSQL databases, allowing users to perform tasks such as creating, modifying, and querying databases, managing users and permissions, and monitoring server performance. It supports a wide range of features, including a SQL editor, server-side query tool, data export and import, and more.
 
@@ -340,7 +340,7 @@ This way we put the code that we have in jupyter notebook in a script an than we
 ```
 SELECT COUNT(1) FROM yellow_taxi_trips;
 ```
-## Data ingestion With Docker
+### Data ingestion With Docker
 
 For dockerize the ingestion we need to update `Dockerfile` and build a new image with this. 
 ```Dockerfile
