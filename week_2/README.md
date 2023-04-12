@@ -8,7 +8,7 @@ Data lakes are often used in big data environments where traditional data wareho
 
 Overall, data lakes provide a powerful platform for storing and analyzing large volumes of data, with the flexibility to handle a wide variety of data types and the ability to support real-time data processing and analytics.
 
-### Data Lake vs Data Warehouse
+## Data Lake vs Data Warehouse
 
 Handling large volumes of data: Data lakes are designed to handle large volumes of data, including structured, semi-structured, and unstructured data. In contrast, data warehouses are typically optimized for structured data, and may not be able to handle the volume and variety of data that companies need to store and analyze.
 
@@ -44,7 +44,7 @@ Data lakes can become a data swamp when there is a lack of proper governance, me
 * Amazon Web Services > [Amazon S3](https://aws.amazon.com/s3/)
 * Microsoft Azure > [Azure Blob](https://azure.microsoft.com/en-us/services/storage/blobs/)
 
-## Workflow Orchestration
+# Introduction to Workflow Orchestration
 
 Workflow orchestration is the process of automating and coordinating the execution of tasks or processes within a larger workflow. In the context of data engineering, workflow orchestration involves defining and automating the sequence of data processing tasks required to transform and store data in a way that is useful for analysis.
 
@@ -66,6 +66,7 @@ Monitoring and logging: The ability to monitor the progress of the workflow, inc
 
 Integration with external systems: The ability to integrate with external systems, such as data storage platforms, compute platforms, and messaging systems, to allow for the orchestration of complex data engineering workflows.
 
+# Introduction to Prefect concepts
 
 We will be exploring a simple Python script that extracts yellow taxi data and loads it into a Postgres database. We will then modify the script to be orchestrated with Prefect, a workflow management system for data engineering.
 
@@ -398,3 +399,36 @@ If we execute a flow again, we can see the same flow name in our terminal and in
 
 The UI also has features such as Deployments, Workqueues, Blocks, Notifications, and Tas kRun Concurrency. Tas kRun Concurrency can be configured for tasks by adding a tag to the task and setting a limit through a CLI command. Notifications are essential for keeping us informed when something goes wrong with our system. Instead of monitoring the dashboard frequently, we can set up notifications to alert us when an issue occurs that requires investigation.
 
+In Prefect, blocks are a basic component that stores configurations and provides an interface for interacting with external systems. There are various types of blocks that you can create, and you can even develop your own. Block names are unchangeable, which means they can be reused across multiple flows. You can also build upon existing blocks or install them as part of the Integration Collection, which contains pre-built tasks and blocks that can be installed via pip. For instance, many users use the SqlAlchemy block.
+
+Now we will take our postgres configuration and store that in a block. We have already installed `prefect-sqlalchemy` via `requirements.txt` Create a SQL Alchemy Connector block and place all configuration in there. Use the `SyncDriver` called `postgresql + psycopg2`, give a name for block and use the arguments of our database. 
+
+```python
+user = "root"
+password = "root"
+host = "localhost"
+port = "5432"
+db = "ny_taxi"
+```
+
+After submitting your information change the flow code and add `from prefect_sqlalchemy import SqlAlchemyConnector`
+
+change load_data() function:
+
+```python
+@task(log_prints=True, retries=3)
+def load_data(table_name, df):
+
+  connection_block = SqlAlchemyConnector.load("postgres-connector")
+  with connection_block.get_connection(begin=False) as engine:
+      df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace')
+      df.to_sql(name=table_name, con=engine, if_exists='append')
+```
+
+It loads a Prefect block called `SqlAlchemyConnector` with the ID "postgres-connector". This block represents a connection to a PostgreSQL database using the SQLAlchemy library.
+
+It uses this block to create a connection to the database, and then uses the connection to append the data in the `df` DataFrame to a table in the database with the name specified by the `table_name` argument. If the table does not exist, it is created. If it does exist, the data is appended to the existing table.
+
+let's run our flow `python ingest_data_flow.py`
+
+# ETL with GCP & Prefect

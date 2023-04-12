@@ -1,4 +1,2 @@
 *.csv.gz
 prefect-zoomcamp
-ingest_data_flow.py
-ingest_data - Copy.py
