@@ -1,5 +1,7 @@
 # Introduction to Docker
 
+Docker is an open-source platform for developing, shipping, and running applications in containers. A container is a lightweight and portable executable package of software that includes everything needed to run an application, such as code, libraries, dependencies, and configurations. Docker allows developers to create and manage containers easily, enabling them to develop applications on any platform, package them with all their dependencies, and deploy them to any environment without any compatibility issues. Docker provides a standardized way to package, distribute, and run applications, making it easier for developers to build and deploy their applications.
+
 ### Why should we care about Docker?
 * Reproducibality
 * Local Experiments
