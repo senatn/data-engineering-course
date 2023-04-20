@@ -433,3 +433,4 @@ let's run our flow `python ingest_data_flow.py`
 
 # ETL with GCP & Prefect
 
+We will prepare the environment first. If you have stopped and restarted a GCP VM instance, make sure the IP in your `config` file is up to date. Open remote VSCode and activate the Zoomcamp Conda environment. In another terminal, use prefect orion start to start the Prefect UI on your local machine. Create a new folder called `02_gcp`, and in that folder, create a file named `elt_web_to_gcs.py`. We are going to do here is have one main fuction 
