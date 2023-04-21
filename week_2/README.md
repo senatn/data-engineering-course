@@ -433,4 +433,101 @@ let's run our flow `python ingest_data_flow.py`
 
 # ETL with GCP & Prefect
 
-We will prepare the environment first. If you have stopped and restarted a GCP VM instance, make sure the IP in your `config` file is up to date. Open remote VSCode and activate the Zoomcamp Conda environment. In another terminal, use prefect orion start to start the Prefect UI on your local machine. Create a new folder called `02_gcp`, and in that folder, create a file named `elt_web_to_gcs.py`. We are going to do here is have one main fuction 
+We will prepare the environment first. If you have stopped and restarted a GCP VM instance, make sure the IP in your `config` file is up to date. Open remote VSCode and activate the Zoomcamp Conda environment. In another terminal, use prefect orion start to start the Prefect UI on your local machine. Create a new folder called `02_gcp`, and in that folder, create a file named `elt_web_to_gcs.py`. 
+
+The main flow of the program consists of several task functions that are called by a single function. The purpose of this function is to retrieve yellow taxi data from a web source, perform data cleaning and transformation operations, and store the resulting data as a parquet file in our data lake located in Google Cloud Storage (GCS).
+
+```python
+from pathlib import Path
+import pandas as pd
+from prefect import flow, task
+from prefect_gcp.cloud_storage import GcsBucket
+
+
+@task(retries=3)
+def fetch(dataset_url: str) -> pd.DataFrame:
+    """Read taxi data from web into pandas DataFrame"""
+    df = pd.read_csv(dataset_url)
+    return df
+
+
+@task(log_prints=True)
+def clean(df: pd.DataFrame) -> pd.DataFrame:
+    """Fix dtype issues"""
+    df["tpep_pickup_datetime"] = pd.to_datetime(df["tpep_pickup_datetime"])
+    df["tpep_dropoff_datetime"] = pd.to_datetime(df["tpep_dropoff_datetime"])
+    print(df.head(2))
+    print(f"columns: {df.dtypes}")
+    print(f"rows: {len(df)}")
+    return df
+
+
+@task()
+def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
+    """Write DataFrame out locally as parquet file"""
+    path = Path(f"data/{color}/{dataset_file}.parquet")
+    df.to_parquet(path, compression="gzip")
+    return path
+
+
+@task()
+def write_gcs(path: Path) -> None:
+    """Upload local parquet file to GCS"""
+    gcs_block = GcsBucket.load("zoom-gcs")
+    gcs_block.upload_from_path(from_path=path, to_path=path)
+    return
+
+
+@flow()
+def etl_web_to_gcs() -> None:
+    """The main ETL function"""
+    color = "yellow"
+    year = 2021
+    month = 1
+    dataset_file = f"{color}_tripdata_{year}-{month:02}"
+    dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}.csv.gz"
+
+    df = fetch(dataset_url)
+    df_clean = clean(df)
+    path = write_local(df_clean, color, dataset_file)
+    write_gcs(path)
+
+
+if __name__ == "__main__":
+    etl_web_to_gcs()
+```
+
+`pathlib`: A module for object-oriented file system paths. It offers an object-oriented way of handling file system paths instead of using string-based paths directly. Path is a class from this module that represents a file system path.
+
+`prefect_gcp`: A set of Prefect integrations for interacting with Google Cloud Platform (GCP) services. `cloudstorage` is a subpackage of `prefect_gcp` that provides tasks and utilities for interacting with GCP Cloud Storage. `GcsBucket`: A class from `prefect_gcp.cloudstorage` that represents a GCP Cloud Storage bucket. It provides methods for interacting with the bucket, such as uploading and downloading files.
+
+The code defines four tasks using the `@task` decorator: `fetch`, `clean`, `write_local`, and `write_gcs`. Each task takes input and produces output as defined by its function signature. The `fetch` task reads a CSV file from a given URL and returns a pandas DataFrame. The `clean` task performs data cleaning operations on the input DataFrame, such as converting columns to the appropriate data type and printing summary information. The `write_local` task writes the cleaned DataFrame to a parquet file on the local file system and returns the file path. The `write_gcs` task uploads the parquet file to a Google Cloud Storage bucket using the GcsBucket block from the `prefect_gcp.cloud_storage` module. The `etl_web_to_gcs` function defines the main flow of the program using the `@flow` decorator. It defines the workflow by chaining the tasks together and passing the outputs of one task as the inputs to the next task. It also defines the input parameters for the workflow, such as the year and month of the dataset to fetch. Finally, the code executes the `etl_web_to_gcs` workflow if the script is run as the main program.
+
+ETL (Extract, Transform, Load) process to retrieve data from a web source, clean and transform the data, and store it as a parquet file in Google Cloud Storage.
+
+## Prefect Blocks: GCS Bucket
+
+In SSH terminal use `prefect block register -m prefect_gcp` to add additional GCP blocks.
+
+`prefect block register` is a command in the Prefect CLI that is used to register a block with the Prefect Blocks registry. `-m` is a flag that specifies the block module to register. In this case, `prefect_gcp` is the block module being registered. So, `prefect block register -m prefect_gcp` would register the `prefect_gcp` module as a block with the Prefect Blocks registry. This would allow other users to discover and use the `prefect_gcp` block in their workflows.
+
+```
+Successfully registered 6 blocks
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Registered Blocks         ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ BigQuery Warehouse        │
+│ GCP Cloud Run Job         │
+│ GCP Credentials           │
+│ GcpSecret                 │
+│ GCS Bucket                │
+│ Vertex AI Custom Training │
+│ Job                       │
+└───────────────────────────┘
+
+To configure the newly registered blocks, go to the Blocks page in the Prefect UI: http://127.0.0.1:4200/blocks/catalog
+```
+Go to the Prefect Orion UI in your browser and click on "Blocks". Click "Add a Block" and select "GCS Bucket".
+
+## Prefect Blocks: GCS Credentials and Service Accounts
