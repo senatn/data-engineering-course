@@ -528,6 +528,64 @@ Successfully registered 6 blocks
 
 To configure the newly registered blocks, go to the Blocks page in the Prefect UI: http://127.0.0.1:4200/blocks/catalog
 ```
-Go to the Prefect Orion UI in your browser and click on "Blocks". Click "Add a Block" and select "GCS Bucket".
+Go to the Prefect Orion UI in your browser and click on "Blocks". Click "Add a Block" and select "GCS Bucket". Choose a name for your block (e.g. "zoom-gcs"), add the name of your GCS bucket (In GCP under Buckets). Under GCP Credentials, click ADD and choose a name for your GCS Credential block name (e.g. "zoom-gcp-creds")
 
 ## Prefect Blocks: GCS Credentials and Service Accounts
+
+GCS (Google Cloud Storage) Credentials refer to the authentication credentials that allow you to access your Google Cloud Storage resources, such as buckets and objects. These credentials typically include a Service Account, which is a special type of Google account that belongs to your application or a virtual machine (VM) instance rather than to an individual end user.
+
+Service Accounts can be used to authenticate to various Google Cloud services, including Google Cloud Storage, and are used to manage access to resources in the Google Cloud Platform (GCP) environment. A Service Account is associated with a set of credentials that are used to authenticate your application with the Google Cloud APIs.
+
+To use GCP and GCS, you will typically need to create a Service Account and provide it with the appropriate permissions to access your resources. Once you have created your Service Account, you can use the associated credentials to authenticate your application when accessing Google Cloud Storage.
+
+Before click ADD button under the GCP Credentials In Prefect Orion UI go to the GCP - IAM & Admin - Service Accounts page. Click "+ Create Service Account" choose a name and add BigQuery Admin and Storage Admin.
+
+To create a new key for the service account, select Manage Keys from the Service Account page in the GCP console. Then, click on Add Key and choose Create New Key. Select JSON as the key type and save the file in a secure location. Open the saved file with a text editor and copy the contents. Then, paste the copied text into the Service Account Info field on the credential Block creation page in Orion. Click on Create, and you will be taken back to the GCS Bucket Block creation page. Select the credential you just created and click on Create. Finally, copy the generated snippet text on the next page.
+
+run `python etl_web_to_gcs.py` in remote terminal an there is the logs in terminal(also you can see logs in Prefect UI - Flow Runs - Logs)
+
+```
+14:15:07.351 | INFO    | prefect.engine - Created flow run 'ivory-hippo' for flow 'etl-web-to-gcs'
+14:15:07.557 | INFO    | Flow run 'ivory-hippo' - Created task run 'fetch-b4598a4a-0' for task 'fetch'
+14:15:07.560 | INFO    | Flow run 'ivory-hippo' - Executing 'fetch-b4598a4a-0' immediately...
+/home/senat/prefect-zoomcamp/flows/02_gcp/etl_web_to_gcs.py:14: DtypeWarning: Columns (6) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(dataset_url)
+14:15:13.219 | INFO    | Task run 'fetch-b4598a4a-0' - Finished in state Completed()
+14:15:13.275 | INFO    | Flow run 'ivory-hippo' - Created task run 'clean-b9fd7e03-0' for task 'clean'
+14:15:13.277 | INFO    | Flow run 'ivory-hippo' - Executing 'clean-b9fd7e03-0' immediately...
+14:15:13.979 | INFO    | Task run 'clean-b9fd7e03-0' -    VendorID  ... congestion_surcharge
+0       1.0  ...                  2.5
+1       1.0  ...                  0.0
+
+[2 rows x 18 columns]
+14:15:13.981 | INFO    | Task run 'clean-b9fd7e03-0' - columns: VendorID                        float64
+tpep_pickup_datetime     datetime64[ns]
+tpep_dropoff_datetime    datetime64[ns]
+passenger_count                 float64
+trip_distance                   float64
+RatecodeID                      float64
+store_and_fwd_flag               object
+PULocationID                      int64
+DOLocationID                      int64
+payment_type                    float64
+fare_amount                     float64
+extra                           float64
+mta_tax                         float64
+tip_amount                      float64
+tolls_amount                    float64
+improvement_surcharge           float64
+total_amount                    float64
+congestion_surcharge            float64
+dtype: object
+14:15:13.982 | INFO    | Task run 'clean-b9fd7e03-0' - rows: 1369765
+14:15:14.019 | INFO    | Task run 'clean-b9fd7e03-0' - Finished in state Completed()
+14:15:14.072 | INFO    | Flow run 'ivory-hippo' - Created task run 'write_local-f322d1be-0' for task 'write_local'
+14:15:14.074 | INFO    | Flow run 'ivory-hippo' - Executing 'write_local-f322d1be-0' immediately...
+14:15:19.284 | INFO    | Task run 'write_local-f322d1be-0' - Finished in state Completed()
+14:15:19.332 | INFO    | Flow run 'ivory-hippo' - Created task run 'write_gcs-1145c921-0' for task 'write_gcs'
+14:15:19.333 | INFO    | Flow run 'ivory-hippo' - Executing 'write_gcs-1145c921-0' immediately...
+14:15:19.482 | INFO    | Task run 'write_gcs-1145c921-0' - Getting bucket 'dtc_data_lake_exalted-point-376315'.
+14:15:19.679 | INFO    | Task run 'write_gcs-1145c921-0' - Uploading from PosixPath('data/yellow/yellow_tripdata_2021-01.parquet') to the bucket 'dtc_data_lake_exalted-point-376315' path 'data/yellow/yellow_tripdata_2021-01.parquet'.
+14:15:20.239 | INFO    | Task run 'write_gcs-1145c921-0' - Finished in state Completed()
+14:15:20.282 | INFO    | Flow run 'ivory-hippo' - Finished in state Completed('All states completed.')
+```
