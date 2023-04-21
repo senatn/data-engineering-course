@@ -437,6 +437,8 @@ We will prepare the environment first. If you have stopped and restarted a GCP V
 
 The main flow of the program consists of several task functions that are called by a single function. The purpose of this function is to retrieve yellow taxi data from a web source, perform data cleaning and transformation operations, and store the resulting data as a parquet file in our data lake located in Google Cloud Storage (GCS).
 
+Parquet is an open-source columnar storage format that is optimized for use with large-scale data processing frameworks like Hadoop and Spark. It provides a highly compressed and efficient way of storing data in a columnar fashion, which can lead to significant improvements in query performance, especially when dealing with large datasets. Parquet files can be used in a variety of applications, such as data warehousing, big data analytics, and machine learning. They can be read and written using a variety of programming languages, including Python, Java, and Scala.
+
 ```python
 from pathlib import Path
 import pandas as pd
@@ -589,3 +591,94 @@ dtype: object
 14:15:20.239 | INFO    | Task run 'write_gcs-1145c921-0' - Finished in state Completed()
 14:15:20.282 | INFO    | Flow run 'ivory-hippo' - Finished in state Completed('All states completed.')
 ```
+
+# From Google Cloud Storage to Big Query
+
+BigQuery is a cloud-based data warehouse provided by Google Cloud Platform that allows users to store, manage, query, and analyze massive volumes of data using a SQL-like interface. It is designed to handle petabyte-scale datasets and perform fast, ad-hoc queries in real-time. It integrates with other Google Cloud services like Cloud Storage and Cloud Dataflow to provide a seamless end-to-end data processing pipeline. Additionally, it supports features like machine learning, geospatial analysis, and advanced analytics through the use of SQL extensions and user-defined functions.
+
+```python
+from pathlib import Path
+import pandas as pd
+from prefect import flow, task
+from prefect_gcp.cloud_storage import GcsBucket
+from prefect_gcp import GcpCredentials
+
+
+@task(retries=3)
+def extract_from_gcs(color: str, year: int, month: int) -> Path:
+    """Download trip data from GCS"""
+    gcs_path = f"data/{color}/{color}_tripdata_{year}-{month:02}.parquet"
+    gcs_block = GcsBucket.load("zoom-gcs")
+    gcs_block.get_directory(from_path = gcs_path, local_path = f"../data/")
+    return Path(f"../data/{gcs_path}")
+
+
+@task()
+def transform(path: Path) -> pd.DataFrame:
+    """Data cleaning example"""
+    df = pd.read_parquet(path)
+    print(f"pre: missing passenger count: {df['passenger_count'].isna().sum()}")
+    df["passenger_count"].fillna(0, inplace=True)
+    print(f"post: missing passenger count: {df['passenger_count'].isna().sum()}")
+    return df
+
+
+@task()
+def write_bq(df: pd.DataFrame) -> None:
+    """Write DataFrame to BiqQuery"""
+
+    gcp_credentials_block = GcpCredentials.load("zoom-gcp-creds")
+
+    df.to_gbq(
+        destination_table = "dezoomcamp.rides",
+        project_id = "exalted-point-376315",
+        credentials = gcp_credentials_block.get_credentials_from_service_account(),
+        chunksize = 500_000, 
+        if_exists = "append",
+    )
+
+
+@flow()
+def etl_gcs_to_bq():
+    """Main ETL flow to load data into Big Query"""
+    color = "yellow"
+    year = 2021
+    month = 1
+
+    path = extract_from_gcs(color, year, month)
+    df = transform(path)
+    write_bq(df)
+
+
+if __name__ == "__main__":
+    etl_gcs_to_bq()
+```
+
+A `task` decorator is used to define a function `extract_from_gcs()`, which downloads trip data from Google Cloud Storage (GCS) using the `GcsBucket` block from `prefect_gcp.cloud_storage`. The function takes three arguments - color, year, and month - which are used to construct the path to the desired file. The `get_directory` method is used to download all files from a specified directory path in a GCS bucket to a specified local directory path. In this particular line, it is downloading a single file from a specific directory in the GCS bucket using the `from_path` argument and saving it to a local directory path using the `local_path` argument. The function returns a Path object representing the local path of the downloaded file.
+
+Another `task` decorator is used to define a function `transform()`, which performs data cleaning on the downloaded file. The function takes a `Path` object as its only argument, reads the parquet file into a pandas dataframe, replaces any missing values in the `passenger_count` column with 0, and returns the cleaned dataframe.
+
+`isna()` is a pandas method used to check if a value in a dataframe is missing or not. It returns a boolean value (True or False) indicating if the value is missing (NaN or None) or not.
+
+`fillna()` is another pandas method that is used to fill missing or NaN values in a dataframe with a specified value. The `inplace=True` parameter applies the changes to the existing DataFrame.
+
+A final `task` decorator is used to define a function `write_bq()`, which writes the cleaned dataframe to BigQuery using the `to_gbq()` method from pandas. The function takes the cleaned dataframe as its only argument and uses the `GcpCredentials` block from `prefect_gcp` to authenticate the write operation. `gcp_credentials_block.get_credentials_from_service_account()` is a method that returns a credentials object that can be used to authenticate access to GCP resources, such as BigQuery. `df.to_gbq()` is a method in Pandas that allows a DataFrame to be written to a Google BigQuery table. The method uses the Google Cloud Python library, `google-cloud-bigquery`, to load the DataFrame into BigQuery.
+
+The `to_gbq()` method takes several arguments, including the destination table name, project ID, and the BigQuery credentials. The method also allows specifying whether the data should be appended to the existing table, replaced, or fail if the table already exists. Additionally, the method also supports chunking the data when uploading it to BigQuery, which can be useful for uploading large datasets.
+
+A `flow` decorator is used to define the main ETL flow `etl_gcs_to_bq()`, which combines the `extract_from_gcs()`, `transform()`, and `write_bq()` tasks. The flow specifies the input parameters `color`, `year`, and `month`, which are used by the `extract_from_gcs()` task to construct the GCS file path. The flow then executes the tasks in order, passing the output of one task as input to the next.
+
+Overall, this ETL flow download trip data from GCS, perform data cleaning, and write the cleaned data to BigQuery.
+
+Also to load data from Google Cloud Storage (GCS) to Google BigQuery (GBQ), you can use the GBQ web console. First, navigate to the console and search for "BigQuery." Once in the BigQuery web UI, click the "Create table" button and select GCS as the data source. Then, fill out the required fields in the GUI, such as the GCS path to the data and the schema for the table. Once you've entered all of the necessary information, click "Create table" to load the data into GBQ.
+
+run `python etl_gcs_to_bq.py` in remote terminal and you can check in Prefect UI
+
+Run these queries to check data in GBQ
+
+SELECT COUNT(*) FROM `PROJECT_NAME.dezoomcamp.rides` 
+
+SELECT * FROM `PROJECT_NAME.dezoomcamp.rides` LIMIT 1000
+# Parametrizing Flow & Deployments with ETL into GCS flow  -  17:23
+
+# Schedules & Docker Storage with Infrastructure  -  24:21
