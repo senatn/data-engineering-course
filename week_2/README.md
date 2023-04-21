@@ -672,13 +672,34 @@ Overall, this ETL flow download trip data from GCS, perform data cleaning, and w
 
 Also to load data from Google Cloud Storage (GCS) to Google BigQuery (GBQ), you can use the GBQ web console. First, navigate to the console and search for "BigQuery." Once in the BigQuery web UI, click the "Create table" button and select GCS as the data source. Then, fill out the required fields in the GUI, such as the GCS path to the data and the schema for the table. Once you've entered all of the necessary information, click "Create table" to load the data into GBQ.
 
-run `python etl_gcs_to_bq.py` in remote terminal and you can check in Prefect UI
+Run `python etl_gcs_to_bq.py` in remote terminal and you can check in Prefect UI
 
 Run these queries to check data in GBQ
 
 SELECT COUNT(*) FROM `PROJECT_NAME.dezoomcamp.rides` 
 
 SELECT * FROM `PROJECT_NAME.dezoomcamp.rides` LIMIT 1000
-# Parametrizing Flow & Deployments with ETL into GCS flow  -  17:23
+# Parametrizing Flow & Deployments
 
-# Schedules & Docker Storage with Infrastructure  -  24:21
+Now, we will add parameterization to our Prefect flows and create deployments. We will be building upon the `etl_web_to_gsc.py` file, so let's create a new file called `parameterized_flow.py`.
+
+## Parametrizing the script from your flow
+
+
+## Parameter validation with Pydantic
+## Creating a deployment locally
+## Setting up Prefect Agent
+## Running the flow
+## Notifications
+
+# Schedules & Docker Storage with Infrastructure
+
+## Scheduling a deployment
+## Flow code storage
+## Running tasks in Docker
+
+# Prefect Cloud and Additional Resources
+
+## Using Prefect Cloud instead of local Prefect
+## Workspaces
+## Running flows on GCP
