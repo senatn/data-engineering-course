@@ -542,7 +542,7 @@ Before click ADD button under the GCP Credentials In Prefect Orion UI go to the 
 
 To create a new key for the service account, select Manage Keys from the Service Account page in the GCP console. Then, click on Add Key and choose Create New Key. Select JSON as the key type and save the file in a secure location. Open the saved file with a text editor and copy the contents. Then, paste the copied text into the Service Account Info field on the credential Block creation page in Orion. Click on Create, and you will be taken back to the GCS Bucket Block creation page. Select the credential you just created and click on Create. Finally, copy the generated snippet text on the next page.
 
-To run python etl_web_to_gcs.py, open a remote terminal and check the logs in the terminal. You can also view the logs in the Prefect UI under Flow Runs > Logs.
+To run `python etl_web_to_gcs.py`, open a remote terminal and check the logs in the terminal. You can also view the logs in the Prefect UI under Flow Runs > Logs.
 
 ```
 14:15:07.351 | INFO    | prefect.engine - Created flow run 'ivory-hippo' for flow 'etl-web-to-gcs'
