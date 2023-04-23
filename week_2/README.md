@@ -778,7 +778,7 @@ To run the workflow scheduled in the previous step, we need to launch an agent. 
 
 ## Notifications
 
-
+Users can configure notifications to be sent via various channels, including email, Slack, PagerDuty, and more. These notifications can alert users when a workflow run has started, completed, failed, or been skipped, and can provide details such as the run ID, flow name, and any relevant logs or errors. Notifications can help users stay informed and quickly respond to any issues that arise during workflow execution.
 
 # Schedules & Docker Storage with Infrastructure
 
