@@ -685,12 +685,100 @@ Now, we will add parameterization to our Prefect flows and create deployments. W
 
 ## Parametrizing the script from your flow
 
+```python
+@flow()
+def etl_web_to_gcs(year: int, month: int, color: str) -> None:
+    """The main ETL function"""
+    dataset_file = f"{color}_tripdata_{year}-{month:02}"
+    dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}.csv.gz"
 
-## Parameter validation with Pydantic
-## Creating a deployment locally
-## Setting up Prefect Agent
-## Running the flow
+    df = fetch(dataset_url)
+    df_clean = clean(df)
+    path = write_local(df_clean, color, dataset_file)
+    write_gcs(path)
+
+
+@flow()
+def etl_parent_flow(
+    months: list[int] = [1, 2], year: int = 2021, color: str = "yellow"
+):
+    for month in months:
+        etl_web_to_gcs(year, month, color)
+
+
+if __name__ == "__main__":
+    color = "yellow"
+    months = [1, 2, 3]
+    year = 2021
+    etl_parent_flow(months, year, color)
+```
+First we are add parametters to `etl_web_to_gcs` fuction
+
+This code defines two Prefect flows: `etl_web_to_gcs` and `etl_parent_flow`.
+
+`etl_web_to_gcs` takes three parameters: `year`, `month`, and `color`. It uses these parameters to construct a URL to download a specific dataset, fetches the dataset, cleans it, writes it to a local file, and then writes it to Google Cloud Storage.
+
+`etl_parent_flow` takes three parameters as well, but sets default values for `months`, `year`, and `color`. It loops over the provided months and calls `etl_web_to_gcs` for each month.
+
+Finally, the code sets some variables (`color`, `months`, and `year`) and calls `etl_parent_flow` with these variables as arguments.
+
+This allows you to parameterize your flows and create more complex workflows that call other flows with different parameters.
+
+```python
+from prefect.tasks import task_input_hash
+from datetime import timedelta
+
+
+@task(retries=3, cache_key_fn=task_input_hash, cache_expiration=timedelta(days=1))
+def fetch(dataset_url: str) -> pd.DataFrame:
+    """Read taxi data from web into pandas DataFrame"""
+    df = pd.read_csv(dataset_url)
+    return df
+```
+Add the `cache_key_fn` to the `fetch` function for generate a unique identifier for the task based on its inputs.
+
+## Prefect Deployment
+
+https://docs.prefect.io/latest/concepts/deployments/
+
+Prefect Deployment refers to the process of deploying a Prefect Flow to an environment where it can be scheduled and executed, such as a cloud-based infrastructure like AWS or GCP, or an on-premise server. Deploying a Prefect Flow involves packaging up the code, dependencies, and any required configurations into a deployable unit, which can then be executed in a target environment.
+
+The process of deployment typically involves creating a container image or executable file that includes the Prefect Flow and any required dependencies. This can be done using tools like Docker or Kubernetes, which allow for easy containerization and orchestration of the deployment process. Once the container or executable is built, it can be deployed to the target environment and scheduled for execution according to a desired schedule or trigger.
+
+There are two methods to create a deployment: via CLI command or using Python. In this case, we'll use the CLI to create a deployment. 
+
+`prefect deployment build ./parameterized_flow.py:etl_parent_flow -n "Parameterized ETL"`
+
+After executing the CLI command, a YAML file containing all the deployment details is generated. This file serves as the metadata, and the parameters can be adjusted in the YAML file or in the UI after applying the changes. In this case, let's adjust the parameters in the YAML file by adding `{"color": "yellow", "months" :[1, 2, 3], "year": 2021}`.
+
+Once the YAML file has been updated, we can apply the deployment by running `prefect deployment apply etl_parent_flow-deployment.yaml.`
+
+## Prefect Deployments on UI
+
+If you go to the Orion user interface, you'll be able to see that the deployment has been created. After creating the deployment, you can modify various parameters or add new details using the UI. Once you have made the desired changes, you can run the deployment.
+
+After initiating a quick run, the flow will enter the "Scheduled" state under "Flow runs". To execute this workflow, we need to set up an agent for deployment.
+## Prefect Work Queues and Agents
+
+https://docs.prefect.io/latest/concepts/work-pools/
+
+[What’s the role of agents and work queues](https://discourse.prefect.io/t/whats-the-role-of-agents-and-work-queues-and-how-the-concept-of-agents-differ-between-prefect-1-0-and-2-0/689)
+
+Prefect Work Queues and Agents are components of the Prefect workflow orchestration platform that allow you to schedule, manage, and execute your workflows in a distributed environment.
+
+A work queue is a message queue system that holds the tasks that need to be executed. Work queues are used to decouple the processing of a task from the application that submits the task. In the context of Prefect, work queues are used to store and distribute tasks across a cluster of computing resources.
+
+An agent is a process that runs on a computing resource, such as a server or a container, and is responsible for executing tasks that are assigned to it by the Prefect server. Agents monitor a work queue for new tasks and pull them off the queue for execution. Prefect provides several types of agents, including LocalAgent, DockerAgent, KubernetesAgent, and AWSBatchAgent, which are designed to work with different computing environments.
+
+Together, work queues and agents allow you to distribute your workflows across multiple computing resources, which can significantly improve performance and scalability.
+
+To run the workflow scheduled in the previous step, we need to launch an agent. The following command will start the agent and configure it to run the workflow automatically: 
+
+`prefect agent start --work-queue "default"`
+
 ## Notifications
+
+
 
 # Schedules & Docker Storage with Infrastructure
 
