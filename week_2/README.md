@@ -845,3 +845,80 @@ Finally push the image
 ```bash
 docker image push senatn/prefect:zoom
 ```
+
+## Prefect Blocks: Docker Container
+
+To add a Docker Container block on Orion, navigate to the Blocks page and click on the "Add Block" button. From there, select "Docker Container" and give it a name of your choice. Next, in the "Image (optional)" field, enter the name of your Docker image. Make sure to set the "Image Pull Policy" to "Always" (it is set to "ALWAYS" so that the latest version of the image is always used.) and toggle "AutoRemove" on. Once you have done this, click "Create" and then copy the code provided on the resulting page.
+
+```bash
+from prefect.infrastructure.docker import DockerContainer
+
+docker_container_block = DockerContainer.load("zoom")
+```
+
+Creating blocks using Python code is also an option. This code creates a DockerContainer block in Prefect using Python code instead of the UI. The DockerContainer object is imported from the `prefect.infrastructure.docker` module, which allows you to interact with Docker containers from Prefect.
+
+The code creates a new DockerContainer object with the specified parameters
+
+```python
+from prefect.infrastructure.docker import DockerContainer
+
+# alternative to creating DockerContainer block in the UI
+docker_block = DockerContainer(
+    image="senatn/prefect:zoom",  # insert your image here
+    image_pull_policy="ALWAYS",
+    auto_remove=True,
+)
+
+docker_block.save("zoom", overwrite=True)
+
+```
+
+`auto_remove` specifies whether the container should be automatically removed after it finishes running. It is set to True here. The save method is called on the `docker_block` object to save it as a block named "zoom" in Prefect. The overwrite parameter is set to `True` so that any existing block with the same name will be overwritten.
+
+##  Prefect Deployment from a Python Script
+
+We will now proceed with deploying our flows from a Python script. First, create a new file named `docker_deploy.py` in the same directory where you have saved your `parametized_flow.py` file. Because we will import necessary functions from our `parametized_flow.py` file.
+
+```python
+from prefect.deployments import Deployment
+from parameterized_flow import etl_parent_flow
+from prefect.infrastructure.docker import DockerContainer
+
+docker_block = DockerContainer.load("zoom")
+
+docker_dep = Deployment.build_from_flow(
+    flow=etl_parent_flow,
+    name="docker-flow",
+    infrastructure=docker_block,
+)
+
+
+if __name__ == "__main__":
+    docker_dep.apply()
+
+```
+
+`docker_block = DockerContainer.load("zoom")` This line loads the Docker container block named "zoom" that we previously created and saved.
+
+```python
+docker_dep = Deployment.build_from_flow(
+    flow=etl_parent_flow,
+    name="docker-flow",
+    infrastructure=docker_block,
+)
+```
+This creates a new `Deployment` instance by calling the `build_from_flow` method, which takes three arguments:
+
+`flow`: the Prefect flow to deploy
+`name`: the name of the deployment
+`infrastructure`: the infrastructure to use for the deployment (in this case, Docker container)
+
+`docker_dep.apply()` This line applies the deployment, which means that it will create a new version of the flow with the specified name and infrastructure, and then start running it.
+
+Execute the following command in your terminal
+
+`python docker_deploy.py`
+
+Once the command runs successfully, go to your Orion account and check the list of deployments to confirm that the Docker flow deployment is now visible.
+
