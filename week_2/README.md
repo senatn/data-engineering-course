@@ -782,7 +782,16 @@ Users can configure notifications to be sent via various channels, including ema
 
 # Schedules & Docker Storage with Infrastructure
 
-## Scheduling a deployment
+## Scheduling Flows on Orion UI
+
+Navigate to the deployment you want to schedule in the Prefect UI. Click on the "Schedule" tab in the flow detail page. Click on the "Add Schedule" button In the "Add Schedule" dialog box, select the scheduling method you want to use. You can choose from several options such as "Cron". Configure the scheduling details based on your chosen method. Once you have configured the schedule, click on the "Save" button to save the schedule.
+
+You will need an agent to run the scheduled flows. An agent is responsible for polling the Prefect backend for scheduled runs and executing them. The agent can run on a local machine or a remote server, and can be configured to run specific types of runs on specific environments. 
+
+## Scheduling when creating Deployments (via CLI)
+
+
+
 ## Flow code storage
 ## Running tasks in Docker
 
