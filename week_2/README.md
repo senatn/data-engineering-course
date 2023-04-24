@@ -899,7 +899,11 @@ if __name__ == "__main__":
 
 ```
 
-`docker_block = DockerContainer.load("zoom")` This line loads the Docker container block named "zoom" that we previously created and saved.
+```
+docker_block = DockerContainer.load("zoom")
+```
+
+ This line loads the Docker container block named "zoom" that we previously created and saved.
 
 ```python
 docker_dep = Deployment.build_from_flow(
@@ -908,6 +912,7 @@ docker_dep = Deployment.build_from_flow(
     infrastructure=docker_block,
 )
 ```
+
 This creates a new `Deployment` instance by calling the `build_from_flow` method, which takes three arguments:
 
 `flow`: the Prefect flow to deploy
