@@ -790,13 +790,58 @@ You will need an agent to run the scheduled flows. An agent is responsible for p
 
 ## Scheduling when creating Deployments (via CLI)
 
+This command is used to build and deploy a Prefect flow using the `parameterized_flow.py` file, specifically the `etl_parent_flow` function.
 
+```bash
+prefect deployment build parameterized_flow.py:etl_parent_flow -n etl2 --cron "0 0 * * *" -a
+```
+`parameterized_flow.py:etl_parent_flow` This specifies the Python file and function to use for the flow. `-n etl2` This specifies the name of the deployment. `--cron "0 0 * * *"` This specifies the cron schedule for the flow. In this case, it is set to run at midnight every day. `-a` This option specifies that the deployment should be automatically started after it is created.
 
-## Flow code storage
-## Running tasks in Docker
+cron is a time-based job scheduler in Unix-like operating systems. It allows users to schedule and automate repetitive tasks, such as backups or system updates, by specifying a set of instructions, called "cron jobs," that the system will execute at a specified time or interval. The syntax for setting up a cron job includes specifying the time, day, week, or month when the job should run, as well as the command to be executed. Cron jobs can be scheduled to run at specific intervals, such as every minute, hourly, daily, weekly, or monthly.
 
-# Prefect Cloud and Additional Resources
+And you can use `prefect deployment build --help` to get help in the terminal.
 
-## Using Prefect Cloud instead of local Prefect
-## Workspaces
-## Running flows on GCP
+## Running Prefect Flows on Docker Containers
+
+To make our flow code accessible and production-ready, we can store it in version control, such as GitHub, GitLab, or AWS S3. In order to deploy and run the flow, we can package the code into a Docker image, upload it to Docker Hub, and run the container with the flow code already baked into the image. This allows for easy distribution and deployment of our flow in various environments.
+
+Docker ensures that the environment where the flow is run is consistent across all machines, ensuring that the flow behaves the same way on different machines. Also Docker makes it easy to deploy the flow to different machines, either locally or in the cloud.
+
+First login to your Docker Hub account `docker login`
+
+## Docker Containers: Dockerfile, Build and Publish
+
+Create a Dockerfile that installs any required dependencies for your flow and copies over the flow file(s) and any necessary data files. 
+
+```dockerfile
+FROM prefecthq/prefect:2.7.7-python3.9
+
+COPY docker-requirements.txt .
+
+RUN pip install -r docker-requirements.txt --trusted-host pypi.python.org --no-cache-dir
+
+COPY flows /opt/prefect/flows
+RUN mkdir -p /opt/prefect/data/yellow
+```
+
+`FROM prefecthq/prefect:2.7.7-python3.9` This specifies the base image for the Dockerfile, which in this case is the official Prefect image that comes with Python 3.9 installed.
+
+`COPY docker-requirements.txt .` This copies a file named `docker-requirements.txt` from the current directory to the Docker image. This file likely contains the dependencies required for running the Prefect flows in this project.
+
+`RUN pip install -r docker-requirements.txt --trusted-host pypi.python.org --no-cache-dir` This installs the Python dependencies specified in the `docker-requirements.txt` file using pip.
+
+`COPY flows /opt/prefect/flows` This copies the flows directory from the current directory to the Docker image, which likely contains the Prefect flows defined in this project.
+
+`RUN mkdir -p /opt/prefect/data/yellow` This creates a directory named `/opt/prefect/data/yellow` in the Docker image. This directory may be used to store data used by the Prefect flows in this project.
+
+Build the Docker image using the `docker build` command. Make sure to tag the image appropriately and specify the build context (e.g., the directory where the Dockerfile is located).
+
+```bash
+docker image build -t senatn/prefect:zoom .
+``` 
+
+Finally push the image
+
+```bash
+docker image push senatn/prefect:zoom
+```
