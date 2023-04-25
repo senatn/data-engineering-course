@@ -927,3 +927,22 @@ Execute the following command in your terminal
 
 Once the command runs successfully, go to your Orion account and check the list of deployments to confirm that the Docker flow deployment is now visible.
 
+## Prefect Profiles (Docker Container - Orion Server Integration)
+
+You can use the `prefect profile ls` command in your terminal to see all available profiles. By default, Prefect uses the default profile. However, you can specify a different API endpoint URL by using the `prefect config set` command. For example, to set the API endpoint to a specific URL like "http://127.0.0.1:4200/api", you can run the following command in your terminal:
+
+```bash
+prefect config set PREFECT_API_URL="http://127.0.0.1:4200/api"
+
+```
+
+By doing so, you allow the Docker container to interact with the Orion server and integrate them.
+
+## Prefect Agent & Workflow run in a Docker Container
+
+Start an agent with `prefect agent start -q default`
+
+
+prefect deployment build ./parameterized_flow.py:etl_parent_flow -n "Parametereized ETL "Script at './parameterized_flow.py' 
+
+01_start/parameterized_flow.py /opt/prefect/flows/parameterized_flow.py
