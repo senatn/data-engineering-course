@@ -8,9 +8,8 @@ OLTP (Online Transaction Processing), on the other hand, is a system designed fo
 
 In summary, OLAP is used for complex analysis and historical reporting, while OLTP is used for day-to-day transaction processing.
 
-|   | OLTP | OLAP |
+|   | OLTP - Online Transaction Processing | OLAP - Online Analytical Processing |
 |---|---|---|
-| Full name | Online Transaction Processing | Online Analytical Processing  |
 | Purpose | Control and run essentail business ops in real-time | Plan, solve problems, support decisions, discover hidden insights  |
 | Data Updates  |  Short, fast, initiated by user | Data is periodically refreshed with scheduled, long-running batch jobs  |
 | Database Design | Normalized db's for efficiency  | Denormalized db's for analysis  |
