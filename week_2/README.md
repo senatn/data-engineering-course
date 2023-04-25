@@ -942,7 +942,49 @@ By doing so, you allow the Docker container to interact with the Orion server an
 
 Start an agent with `prefect agent start -q default`
 
+Now that we have an agent and a deployed flow, we can execute the deployment using either the Orion UI or the following CLI command
 
-prefect deployment build ./parameterized_flow.py:etl_parent_flow -n "Parametereized ETL "Script at './parameterized_flow.py' 
+`prefect deployment run etl-parent-flow/docker-flow -p "months=[1,2]"`
 
-01_start/parameterized_flow.py /opt/prefect/flows/parameterized_flow.py
+But i got an error
+
+```
+08:52:08.500 | INFO    | Flow run 'daffy-iguana' - Downloading flow code from storage at '/opt/prefect/flows'
+08:52:08.658 | ERROR   | Flow run 'daffy-iguana' - Flow could not be retrieved from deployment.
+Traceback (most recent call last):
+  File "<frozen importlib._bootstrap_external>", line 846, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 982, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1039, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: 'parameterized_flow.py'
+```
+
+So I change my copied file path in Dockerfile
+
+```dockerfile
+FROM prefecthq/prefect:2.7.7-python3.9
+
+COPY docker-requirements.txt .
+
+RUN pip install -r docker-requirements.txt --trusted-host pypi.python.org --no-cache-dir
+
+COPY flows/03_deployments /opt/prefect/flows/
+RUN mkdir -p /opt/prefect/data/yellow
+```
+
+I delete my prefect deployment, docker image and docker repo. And I started over
+
+```bash
+docker image build -t senatn/prefect:zoom .
+
+docker image push senatn/prefect:zoom
+
+python docker_deploy.py
+
+prefect config set PREFECT_API_URL="http://127.0.0.1:4200/api"
+
+prefect agent start -q default
+
+prefect deployment run etl-parent-flow/docker-flow -p "months=[1,2]"
+```
+
+After executing the flow, the result can be viewed in our Google Cloud Storage (GCS) Bucket and Prefect UI.
