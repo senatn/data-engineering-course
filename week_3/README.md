@@ -22,8 +22,10 @@ In summary, OLAP is used for complex analysis and historical reporting, while OL
 | User examples | Customer-facing personnel, clerks, online shoppers  | Knowledge workers such as data analysts, business analysts, and executives  |
 ## Data Warehouse
 
-A Data Warehouse is a large, centralized repository that stores data from various sources, typically including transactional databases, external data sources, and other applications. The data is organized in a way that facilitates querying, analysis, and reporting.
+A Data Warehouse is an OLAP (Online Analytical Processing) solution.Is a large, centralized repository that stores data from various sources, typically including transactional databases, external data sources, and other applications. Genarally consist of a raw data, metadata and summary. The data is organized in a way that facilitates querying, analysis, and reporting. 
 
 ## BigQuery
 
-BigQuery is a cloud-based data warehousing and analytics service provided by Google Cloud Platform. It is designed to handle large amounts of data and enables users to analyze massive datasets quickly using SQL-like queries. BigQuery allows users to store and query data using a pay-as-you-go model, meaning that they only pay for the amount of data they process and store. Additionally, it has built-in integration with other Google Cloud services, such as Google Cloud Storage and Google Cloud Dataflow, making it easy to ingest data from various sources.
+BigQuery is a cloud-based data warehousing and analytics service provided by Google Cloud Platform. It is designed to handle large amounts of data and enables users to analyze massive datasets quickly using SQL-like queries. Additionally, it has built-in integration with other Google Cloud services, such as Google Cloud Storage and Google Cloud Dataflow, making it easy to ingest data from various sources. Maximizes flexibility by separating data analysis and storage in different compute engines, thus allowing the customers to budget accordingly and reduce costs.
+
+## Create an External Table
