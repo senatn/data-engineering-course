@@ -30,6 +30,8 @@ BigQuery is a cloud-based data warehousing and analytics service provided by Goo
 
 ## Create an External Table
 
+It is possible to generate an external table using a CSV or Parquet file that is located in a Cloud Storage bucket.
+
 ```sql
 -- Creating external table referring to gcs path
 CREATE OR REPLACE EXTERNAL TABLE `exalted-point-376315.dezoomcamp.external_yellow_tripdata`
