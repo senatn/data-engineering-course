@@ -29,3 +29,12 @@ A Data Warehouse is an OLAP (Online Analytical Processing) solution.Is a large, 
 BigQuery is a cloud-based data warehousing and analytics service provided by Google Cloud Platform. It is designed to handle large amounts of data and enables users to analyze massive datasets quickly using SQL-like queries. Additionally, it has built-in integration with other Google Cloud services, such as Google Cloud Storage and Google Cloud Dataflow, making it easy to ingest data from various sources. Maximizes flexibility by separating data analysis and storage in different compute engines, thus allowing the customers to budget accordingly and reduce costs.
 
 ## Create an External Table
+
+```sql
+-- Creating external table referring to gcs path
+CREATE OR REPLACE EXTERNAL TABLE `exalted-point-376315.dezoomcamp.external_yellow_tripdata`
+OPTIONS (
+  format = 'parquet',
+  uris = ['gs://dtc_data_lake_exalted-point-376315/data/yellow/yellow_tripdata_2021-01.parquet', 'gs://dtc_data_lake_exalted-point-376315/data/yellow/yellow_tripdata_2021-02.parquet']
+);
+```
