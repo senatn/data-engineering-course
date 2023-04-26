@@ -14,6 +14,8 @@ OPTIONS (
 -- Check yello trip data
 SELECT * FROM taxi-rides-ny.nytaxi.external_yellow_tripdata limit 10;
 
+SELECT * FROM `exalted-point-376315.dezoomcamp.external_yellow_tripdata` LIMIT 10;
+
 -- Create a non partitioned table from external table
 CREATE OR REPLACE TABLE taxi-rides-ny.nytaxi.yellow_tripdata_non_partitoned AS
 SELECT * FROM taxi-rides-ny.nytaxi.external_yellow_tripdata;
@@ -25,7 +27,7 @@ PARTITION BY
   DATE(tpep_pickup_datetime) AS
 SELECT * FROM taxi-rides-ny.nytaxi.external_yellow_tripdata;
 
--- Impact of partition
+-- Impact of partition 
 -- Scanning 1.6GB of data
 SELECT DISTINCT(VendorID)
 FROM taxi-rides-ny.nytaxi.yellow_tripdata_non_partitoned
