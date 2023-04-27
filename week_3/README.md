@@ -128,3 +128,4 @@ WHERE DATE(tpep_pickup_datetime) BETWEEN '2021-01-01' AND '2021-01-30' AND PULoc
 ```
 Approximation: This query will process 20.42 MB when run.
 Bytes processed: 19.75 MB
+
