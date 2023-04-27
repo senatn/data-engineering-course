@@ -12,8 +12,6 @@ OPTIONS (
 );
 
 -- Check yello trip data
-SELECT * FROM taxi-rides-ny.nytaxi.external_yellow_tripdata limit 10;
-
 SELECT * FROM `exalted-point-376315.dezoomcamp.external_yellow_tripdata` LIMIT 10;
 
 -- Create a non partitioned table from external table

@@ -40,3 +40,10 @@ OPTIONS (
   uris = ['gs://dtc_data_lake_exalted-point-376315/data/yellow/yellow_tripdata_2021-01.parquet', 'gs://dtc_data_lake_exalted-point-376315/data/yellow/yellow_tripdata_2021-02.parquet']
 );
 ```
+
+```sql
+-- Check yello trip data
+SELECT * FROM `exalted-point-376315.dezoomcamp.external_yellow_tripdata` LIMIT 10;
+```
+
+
