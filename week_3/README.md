@@ -45,5 +45,3 @@ OPTIONS (
 -- Check yello trip data
 SELECT * FROM `exalted-point-376315.dezoomcamp.external_yellow_tripdata` LIMIT 10;
 ```
-
-
