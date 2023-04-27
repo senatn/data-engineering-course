@@ -45,3 +45,24 @@ OPTIONS (
 -- Check yello trip data
 SELECT * FROM `exalted-point-376315.dezoomcamp.external_yellow_tripdata` LIMIT 10;
 ```
+
+## Partitioning in BigQuery
+
+Partitioning in BigQuery is a feature that allows you to divide large tables into smaller, more manageable parts based on a specific column or field, known as the partition key. This partitioning can help with query performance and cost optimization. By partitioning a table, you can limit the amount of data that needs to be scanned, which can help to reduce query costs.
+
+When a table is partitioned, it is split into smaller pieces, each containing only the rows that match a specific value or range of values for the partition key. This allows queries to be more focused on a specific subset of the data, reducing the amount of data that needs to be scanned and improving query performance.
+
+We will compare the efficiency of our queries by creating two tables that are partitioned and non partitioned.
+
+```sql
+-- Create a non partitioned table from external table
+CREATE OR REPLACE TABLE exalted-point-376315.dezoomcamp.yellow_tripdata_non_partitoned AS
+SELECT * FROM taxi-rides-ny.nytaxi.external_yellow_tripdata;
+
+
+-- Create a partitioned table from external table
+CREATE OR REPLACE TABLE exalted-point-376315.dezoomcamp.yellow_tripdata_partitoned
+PARTITION BY
+  DATE(tpep_pickup_datetime) AS
+SELECT * FROM exalted-point-376315.dezoomcamp.external_yellow_tripdata;
+```
