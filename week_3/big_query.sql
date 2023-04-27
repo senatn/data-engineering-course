@@ -26,36 +26,34 @@ PARTITION BY
 SELECT * FROM exalted-point-376315.dezoomcamp.external_yellow_tripdata;
 
 -- Impact of partition 
--- Scanning 1.6GB of data
+-- Scanning 40.33 MB of data
 SELECT DISTINCT(VendorID)
 FROM exalted-point-376315.dezoomcamp.yellow_tripdata_non_partitoned
-WHERE DATE(tpep_pickup_datetime) BETWEEN '2019-06-01' AND '2019-06-30';
+WHERE DATE(tpep_pickup_datetime) BETWEEN '2021-01-01' AND '2021-01-30';
 
--- Scanning ~106 MB of DATA
+-- Scanning 19.69 MB of DATA
 SELECT DISTINCT(VendorID)
 FROM exalted-point-376315.dezoomcamp.yellow_tripdata_partitoned
-WHERE DATE(tpep_pickup_datetime) BETWEEN '2019-06-01' AND '2019-06-30';
+WHERE DATE(tpep_pickup_datetime) BETWEEN '2021-01-01' AND '2021-01-30';
 
 -- Let's look into the partitons
 SELECT table_name, partition_id, total_rows
-FROM `nytaxi.INFORMATION_SCHEMA.PARTITIONS`
+FROM `dezoomcamp.INFORMATION_SCHEMA.PARTITIONS`
 WHERE table_name = 'yellow_tripdata_partitoned'
 ORDER BY total_rows DESC;
 
 -- Creating a partition and cluster table
 CREATE OR REPLACE TABLE exalted-point-376315.dezoomcamp.yellow_tripdata_partitoned_clustered
 PARTITION BY DATE(tpep_pickup_datetime)
-CLUSTER BY VendorID AS
+CLUSTER BY PULocationID AS
 SELECT * FROM exalted-point-376315.dezoomcamp.external_yellow_tripdata;
 
 -- Query scans 1.1 GB
 SELECT count(*) as trips
 FROM exalted-point-376315.dezoomcamp.yellow_tripdata_partitoned
-WHERE DATE(tpep_pickup_datetime) BETWEEN '2019-06-01' AND '2020-12-31'
-  AND VendorID=1;
+WHERE DATE(tpep_pickup_datetime) BETWEEN '2021-01-01' AND '2021-01-30' AND PULocationID=43;
 
 -- Query scans 864.5 MB
 SELECT count(*) as trips
 FROM exalted-point-376315.dezoomcamp.yellow_tripdata_partitoned_clustered
-WHERE DATE(tpep_pickup_datetime) BETWEEN '2019-06-01' AND '2020-12-31'
-  AND VendorID=1;
+WHERE DATE(tpep_pickup_datetime) BETWEEN '2021-01-01' AND '2021-01-30' AND PULocationID=43;

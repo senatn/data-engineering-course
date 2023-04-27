@@ -66,3 +66,65 @@ PARTITION BY
   DATE(tpep_pickup_datetime) AS
 SELECT * FROM exalted-point-376315.dezoomcamp.external_yellow_tripdata;
 ```
+
+Performing a query on a partitioned table in BigQuery is similar to querying a non-partitioned table, with one major difference being the amount of data that gets processed. As such, We will provide two examples of queries; one for the non-partitioned table, and one for the partitioned table we created earlier, so we can see the difference in data processing.
+
+```sql
+SELECT DISTINCT(VendorID)
+FROM exalted-point-376315.dezoomcamp.yellow_tripdata_non_partitoned
+WHERE DATE(tpep_pickup_datetime) BETWEEN '2021-01-01' AND '2021-01-30';
+```
+
+This query will process 40.33 MB when run.
+
+```sql
+SELECT DISTINCT(VendorID)
+FROM exalted-point-376315.dezoomcamp.yellow_tripdata_partitoned
+WHERE DATE(tpep_pickup_datetime) BETWEEN '2021-01-01' AND '2021-01-30';
+```
+
+This query will process 19.69 MB when run.
+
+To check the number of rows in each partition of a partitioned table in BigQuery, you can use the following query
+
+```sql
+SELECT table_name, partition_id, total_rows
+FROM `dezoomcamp.INFORMATION_SCHEMA.PARTITIONS`
+WHERE table_name = 'yellow_tripdata_partitoned'
+ORDER BY total_rows DESC;
+```
+## Clustering
+
+Clustering in BigQuery is a feature that allows you to organize data in a table based on the contents of one or more columns. It is similar to partitioning, but instead of dividing the data into separate partitions, it groups related data into clusters based on similarities in the values of the specified columns.
+
+Clustering can help to improve query performance and reduce costs, as it allows BigQuery to skip scanning data that is not relevant to the query. When a query is executed on a clustered table, BigQuery scans only the data that belongs to the relevant clusters, instead of scanning the entire table.
+
+To create a clustered table in BigQuery, you first specify one or more columns that you want to use as the clustering keys. When you load data into the table, BigQuery automatically organizes the data into clusters based on the values of the specified columns.
+
+ In BigQuery, clustering can only be performed on top-level, non-repeated columns. Clustering cannot be performed on nested or repeated fields within a table.
+
+```sql
+-- Creating a partition and cluster table
+CREATE OR REPLACE TABLE exalted-point-376315.dezoomcamp.yellow_tripdata_partitoned_clustered
+PARTITION BY DATE(tpep_pickup_datetime)
+CLUSTER BY PULocationID AS
+SELECT * FROM exalted-point-376315.dezoomcamp.external_yellow_tripdata;
+```
+
+Below are two queries, one for a partitioned table and the other for a partitioned and clustered table, which are identical except for the table names.
+
+```sql
+SELECT count(*) as trips
+FROM exalted-point-376315.dezoomcamp.yellow_tripdata_partitoned
+WHERE DATE(tpep_pickup_datetime) BETWEEN '2021-01-01' AND '2021-01-30' AND PULocationID=43;
+```
+Approximation: This query will process 20.42 MB when run.
+Bytes processed: 20.42 MB
+
+```sql
+SELECT count(*) as trips
+FROM exalted-point-376315.dezoomcamp.yellow_tripdata_partitoned_clustered
+WHERE DATE(tpep_pickup_datetime) BETWEEN '2021-01-01' AND '2021-01-30' AND PULocationID=43;
+```
+Approximation: This query will process 20.42 MB when run.
+Bytes processed: 19.75 MB
